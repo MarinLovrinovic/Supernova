@@ -100,3 +100,10 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Photon Fusion SDK ignores
+[Ff]usionCache/
+[Ff]usionGenerated/
+Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset.meta
+Library/PackageCache/com.exitgames.photon-fusion*
+Library/PackageCache/com.exitgames.photon.realtime*
