@@ -14,6 +14,7 @@ namespace DefaultNamespace
         // Start is called before the first frame update
         void Start()
         {
+            
             weapon = GetComponent<Rigidbody2D>();
         }
         
