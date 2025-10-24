@@ -1,52 +1,52 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEditor.Search;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    [SerializeField] float speed = 10f;
-    [SerializeField] float lifeTime = 10f;
-    public GameObject[] respawns;
-    private Rigidbody2D weapon;
-    // Start is called before the first frame update
+    public GameObject owner;
+    public float speed = 10f;
+    public float lifeTime = 10f;
+    public float damageAmount = 10.0f;
+    public bool damageOnTrigger = true;
+    
+    private Rigidbody2D body;
+
     void Start()
     {
-        weapon = GetComponent<Rigidbody2D>();
+        body = GetComponent<Rigidbody2D>();
         Destroy(gameObject, lifeTime);
-        respawns = GameObject.FindGameObjectsWithTag("Target");
-        
-        if (respawns.Length == 0)
-        {
-            // Debug.Log("No GameObjects are tagged with 'Enemy'");
-        }
-        else
-        {
-            // Debug.Log("GameObjects are tagged with 'Enemy'");
-        }
-        
     }
 
     private void FixedUpdate()
     {
-        weapon.velocity = transform.up * speed;
+        body.velocity = transform.up * speed;
     }
 
-    private void OnCollisionEnter2D(Collision2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
-        // Debug.Log("OnCollisionEnter2D triggered with " + other.gameObject.name);
+        if (IsOwnedBy(other.gameObject)) return;
+
+        if (damageOnTrigger)
+        {
+            if (other.gameObject.GetComponent<Health>() != null)
+            {
+                other.gameObject.GetComponent<Health>().ApplyDamage(damageAmount);
+            }
+        }
+
         Destroy(gameObject);
     }
 
-    // Update is called once per frame
-    void Update()
+    private bool IsOwnedBy(GameObject other)
     {
-        
+        if (other == null || owner == null) return true;
+        if (other == owner || other.transform.IsChildOf(owner.transform)) return true;
+
+        return false;
     }
-
-
-
-
     
 }
