@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 7868025840883224769}
   - component: {fileID: 7251808516213914961}
   - component: {fileID: 1689108609576032035}
+  - component: {fileID: 2764348386662603928}
+  - component: {fileID: 5542897867337555732}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -193,6 +195,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca88faf8d11da2e46ba03b39bf567dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2764348386662603928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1029672585926967827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd326ffcc91640a5b4e0fd3dd33d948c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  projectilePrefab: {fileID: 8738679601424813415, guid: 67ef455291cf8f54ea4a3a2230944b8f, type: 3}
+  firingPoint: {fileID: 8542793270593861832}
+  fireRate: 1
+  fireTimer: 1
+--- !u!114 &5542897867337555732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1029672585926967827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0b8f92b78a34f31b2ce67ca021c4886, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthPoints: 20
+  respawnHealthPoints: 20
+  numberOfLives: 1
+  isAlive: 1
+  onLivesGone: 0
 --- !u!1 &4343121700145042240
 GameObject:
   m_ObjectHideFlags: 0

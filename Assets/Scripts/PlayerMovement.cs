@@ -14,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private bool isAccelerating = false;
     private bool isDeaccelerating = false;
+    private float rotationInput = 0.0f;
 
     public SpriteRenderer jetSprite;
     private void Start()
@@ -35,6 +36,8 @@ public class PlayerMovement : MonoBehaviour
             rb.AddForce(-thrustForceDeacceleration * rb.velocity);
             
         rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxVelocity);
+
+        rb.MoveRotation(rb.rotation + rotationInput * rotationSpeed * Time.fixedDeltaTime);
     }
     private void AccelerateShip()
     {
@@ -59,9 +62,10 @@ public class PlayerMovement : MonoBehaviour
     }
     private void RotateShip()
     {
+        rotationInput = 0f;
         if (Input.GetKey(KeyCode.LeftArrow))
-            transform.Rotate(rotationSpeed * Time.deltaTime * transform.forward);
+            rotationInput = 1f;
         else if (Input.GetKey(KeyCode.RightArrow))
-            transform.Rotate(-rotationSpeed * Time.deltaTime * transform.forward);
+            rotationInput = -1f;
     }
 }
