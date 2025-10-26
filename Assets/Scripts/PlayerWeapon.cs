@@ -1,44 +1,53 @@
 using UnityEngine;
+using Fusion;
 
 namespace DefaultNamespace
 {
-    public class PlayerWeapon : MonoBehaviour
+    public class PlayerWeapon : NetworkBehaviour
     {
-        [SerializeField] private GameObject projectilePrefab;
+        [SerializeField] private NetworkPrefabRef projectilePrefab;
         [SerializeField] private Transform firingPoint;
         [SerializeField] private float fireRate;
         [SerializeField] private float fireTimer;
-        
-        private Rigidbody2D weapon;
-        // Start is called before the first frame update
-        void Start()
+
+        [Networked] private NetworkButtons _buttonsPrevious { get; set; }
+        [Networked] private TickTimer _shootCooldown { get; set; }
+
+        private Rigidbody2D rbWeapon;
+        public override void Spawned()
         {
-            
-            weapon = GetComponent<Rigidbody2D>();
+            rbWeapon = GetComponent<Rigidbody2D>();
         }
-        
-        void Update()
+
+        public override void FixedUpdateNetwork()
         {
-            if (Input.GetKeyDown(KeyCode.Space) && fireTimer <= 0) //OVO JE AKO SVAKI KLIK JEDAN METAK
-            //if (Input.GetKey(KeyCode.Space) && fireTimer <= 0) OVO JE AKO OCEMO DA PUCA CONTINUINIRANO
+            if (Runner.TryGetInputForPlayer<NetworkInputData>(Object.InputAuthority, out var input))
             {
-                ShootWeapon();
-                fireTimer = fireRate;
-            }
-            else
-            {
-                fireTimer -= Time.deltaTime;
+                ShootWeapon(input);
             }
         }
 
-
-        private void ShootWeapon()
+        private void ShootWeapon(NetworkInputData input)
         {
-            Instantiate(projectilePrefab, firingPoint.position, firingPoint.rotation);
+            if (input.Buttons.WasPressed(_buttonsPrevious, SpaceshipButtons.Fire))
+            {
+                SpawnProjectile();
+            }
         }
-        
+        private void SpawnProjectile()
+        {
+            if (_shootCooldown.ExpiredOrNotRunning(Runner) == false || !Runner.CanSpawn) return;
 
-        
+            NetworkObject proj = Runner.Spawn(projectilePrefab, rbWeapon.position, rbWeapon.transform.rotation, Object.InputAuthority);
+
+            if (proj.TryGetComponent(out Projectile projectile))
+            {
+                projectile.projectileOwner = Object.InputAuthority;
+            }
+
+            _shootCooldown = TickTimer.CreateFromSeconds(Runner, fireRate);
+        }
+
     }
     
 }

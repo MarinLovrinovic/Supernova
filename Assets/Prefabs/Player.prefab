@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7251808516213914961}
   - component: {fileID: 1689108609576032035}
   - component: {fileID: 120309127987728467}
+  - component: {fileID: 6607369040697280564}
   - component: {fileID: 6815791091560101078}
   m_Layer: 0
   m_Name: Player
@@ -220,7 +221,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca88faf8d11da2e46ba03b39bf567dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  offsetRatio: 0.5
 --- !u!114 &120309127987728467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,10 +233,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd326ffcc91640a5b4e0fd3dd33d948c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectilePrefab: {fileID: 8738679601424813415, guid: 6b2e5131cae3a84408ee10949c332a5f, type: 3}
+  projectilePrefab:
+    RawGuidValue: 6b2e5131cae3a84408ee10949c332a5f
   firingPoint: {fileID: 2793269183839222586}
-  fireRate: 0.2
+  fireRate: 0.3
   fireTimer: 0
+--- !u!114 &6607369040697280564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1029672585926967827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0b8f92b78a34f31b2ce67ca021c4886, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthPoints: 20
+  respawnHealthPoints: 20
+  numberOfLives: 1
+  isAlive: 1
+  explosionPrefab: {fileID: 0}
+  onLivesGone: 1
+  LevelToLoad: 
 --- !u!114 &6815791091560101078
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,6 +277,8 @@ MonoBehaviour:
   - {fileID: 2011435462428676881}
   - {fileID: 7251808516213914961}
   - {fileID: 1689108609576032035}
+  - {fileID: 120309127987728467}
+  - {fileID: 6607369040697280564}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &4343121700145042240
 GameObject:

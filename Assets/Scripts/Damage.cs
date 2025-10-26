@@ -17,6 +17,7 @@ public class Damage : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D collision)						// used for things like bullets, which are triggers.  
 	{
 		if (damageOnTrigger) {
+			Debug.Log("HIT");
 			if (this.tag == "PlayerBullet" && collision.gameObject.tag == "Player")	// if the player got hit with it's own bullets, ignore it
 				return;
 		

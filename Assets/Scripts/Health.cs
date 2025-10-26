@@ -1,7 +1,9 @@
 using UnityEngine;
 using System.Collections;
+using Fusion;
+using Fusion.Addons.Physics;
 
-public class Health : MonoBehaviour {
+public class Health : NetworkBehaviour {
 	
 	public enum deathAction {loadLevelWhenDead,doNothingWhenDead, destroyedWhenDead};
 	public float healthPoints = 20f;
@@ -14,10 +16,22 @@ public class Health : MonoBehaviour {
 	private Vector3 respawnPosition;
 	private Quaternion respawnRotation;
 	private Rigidbody2D rb;
-	
 
-	// Use this for initialization
-	void Start () 
+    public override void Spawned()
+    {
+        // store initial position as respawn location
+        respawnPosition = transform.position;
+        respawnRotation = transform.rotation;
+        rb = GetComponent<Rigidbody2D>();
+
+        // Debug.Log("This is health of:  " + rb.gameObject.name);
+
+        if (LevelToLoad == "") // default to current scene 
+        {
+            LevelToLoad = Application.loadedLevelName;
+        }
+    }
+    void Start () 
 	{
 		// store initial position as respawn location
 		respawnPosition = transform.position;
@@ -31,10 +45,10 @@ public class Health : MonoBehaviour {
 			LevelToLoad = Application.loadedLevelName;
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
+
+    // Update is called once per frame
+    public override void FixedUpdateNetwork()
+    {
 		if (healthPoints <= 0) {				// if the object is 'dead'
 			numberOfLives--;					// decrement # of lives, update lives GUI
 			

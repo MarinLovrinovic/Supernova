@@ -43,9 +43,7 @@ public class PlayerMovement : NetworkBehaviour
                 rb.AddForce(-thrustForceDeacceleration * rb.velocity);
 
             rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxVelocity);
-        }
-
-        
+        } 
     }
 
     private void AccelerateShip(NetworkInputData input)

@@ -2,50 +2,58 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
+using Fusion.Addons.Physics;
 
-public class Projectile : MonoBehaviour
+public class Projectile : NetworkBehaviour
 {
     [SerializeField] float speed = 10f;
-    [SerializeField] float lifeTime = 10f;
+    [SerializeField] float lifeTime = 1f;
     public GameObject[] respawns;
-    private Rigidbody2D weapon;
-    // Start is called before the first frame update
-    void Start()
+    public float damageAmount = 10f;
+    [Networked] private TickTimer currentLifeTime { get; set; }
+    [Networked] public PlayerRef projectileOwner { get; set; }
+    public override void Spawned()
     {
-        weapon = GetComponent<Rigidbody2D>();
-        Destroy(gameObject, lifeTime);
-        respawns = GameObject.FindGameObjectsWithTag("Target");
-        
-        if (respawns.Length == 0)
+        if (Object.HasStateAuthority == false) return;
+
+        currentLifeTime = TickTimer.CreateFromSeconds(Runner, lifeTime);
+
+        if (TryGetComponent(out Rigidbody2D rb))
         {
-            // Debug.Log("No GameObjects are tagged with 'Enemy'");
+            rb.velocity = transform.up * speed;
         }
-        else
+    }
+    public override void FixedUpdateNetwork()
+    {
+        CheckLifetime();
+    }
+
+    private void CheckLifetime()
+    {
+        if (!currentLifeTime.Expired(Runner)) return;
+
+        Runner.Despawn(Object);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!Object.HasStateAuthority) 
+            return;
+
+        if (!other.CompareTag("Player")) 
+            return;
+
+        var netObj = other.GetComponent<NetworkObject>();
+        if (netObj != null && netObj.InputAuthority == projectileOwner) 
+            return;
+
+        var health = other.GetComponent<Health>();
+        if (health != null && health.isAlive)
         {
-            // Debug.Log("GameObjects are tagged with 'Enemy'");
+            health.ApplyDamage(damageAmount);
         }
-        
+
+        Runner.Despawn(Object);
     }
-
-    private void FixedUpdate()
-    {
-        weapon.velocity = transform.up * speed;
-    }
-
-    private void OnCollisionEnter2D(Collision2D other)
-    {
-        // Debug.Log("OnCollisionEnter2D triggered with " + other.gameObject.name);
-        Destroy(gameObject);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-
-
-
-    
 }
