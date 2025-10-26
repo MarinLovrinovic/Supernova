@@ -107,8 +107,3 @@ InitTestScene*.unity*
 Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset.meta
 Library/PackageCache/com.exitgames.photon-fusion*
 Library/PackageCache/com.exitgames.photon.realtime*
-*.meta
-*.meta
-*.meta
-*.meta
-Assets/Scripts/PlayerWeapon.cs.meta
