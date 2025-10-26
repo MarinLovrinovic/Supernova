@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 5570167888993825213}
   - component: {fileID: 2889103703427026622}
   - component: {fileID: 1211687042217053180}
+  - component: {fileID: -2288734395253545444}
   m_Layer: 0
   m_Name: Projectile
   m_TagString: Untagged
@@ -159,11 +160,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 8738679601424813415}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19bfdf04c4b8b4061984b37ca8c786b8, type: 3}
+  m_Script: {fileID: 11500000, guid: 676f2c6efd2df934b8afbbd7fb811a14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  lifeTime: 4
+  speed: 10
+  lifeTime: 1
   respawns: []
 --- !u!114 &1211687042217053180
 MonoBehaviour:
@@ -174,14 +175,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 8738679601424813415}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b23741669ad49cbaa635b9da6cc1931, type: 3}
+  m_Script: {fileID: 11500000, guid: ca88faf8d11da2e46ba03b39bf567dc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-2288734395253545444
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8738679601424813415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cafb7658a7fb3b645946d9e6cbe649a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   damageAmount: 10
-  damageOnTrigger: 0
-  damageOnCollision: 1
+  damageOnTrigger: 1
+  damageOnCollision: 0
   continuousDamage: 0
   continuousTimeBetweenHits: 0
-  destroySelfOnImpact: 0
+  destroySelfOnImpact: 1
   delayBeforeDestroy: 0
   explosionPrefab: {fileID: 0}

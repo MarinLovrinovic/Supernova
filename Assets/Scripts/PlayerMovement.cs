@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
+using Fusion.Addons.Physics;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
 
     public float thrustForceAcceleration = 1f;
@@ -12,39 +14,49 @@ public class PlayerMovement : MonoBehaviour
     private float maxVelocity = 10f;
 
     private Rigidbody2D rb;
+    [Networked] private NetworkRigidbody2D rbNetwork { get; set; }
+
     private bool isAccelerating = false;
     private bool isDeaccelerating = false;
 
     public SpriteRenderer jetSprite;
-    private void Start()
+
+    public override void Spawned()
     {
         rb = GetComponent<Rigidbody2D>();
+        rbNetwork = rb.GetComponent<NetworkRigidbody2D>();
         jetSprite.enabled = false;
     }
+    public override void FixedUpdateNetwork()
+    {
+        if (Runner.TryGetInputForPlayer<NetworkInputData>(Object.InputAuthority, out var input))
+        {
+            AccelerateShip(input);
+            RotateShip(input);
+        }
 
-    void Update()
-    {
-        AccelerateShip();
-        RotateShip();
+        if (Object.HasStateAuthority)
+        {
+            if (isAccelerating)
+                rb.AddForce(thrustForceAcceleration * transform.up);
+            else if (isDeaccelerating)
+                rb.AddForce(-thrustForceDeacceleration * rb.velocity);
+
+            rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxVelocity);
+        }
+
+        
     }
-    private void FixedUpdate()
+
+    private void AccelerateShip(NetworkInputData input)
     {
-        if (isAccelerating)
-            rb.AddForce(thrustForceAcceleration * transform.up);
-        else if (isDeaccelerating)
-            rb.AddForce(-thrustForceDeacceleration * rb.velocity);
-            
-        rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxVelocity);
-    }
-    private void AccelerateShip()
-    {
-        if(Input.GetKey(KeyCode.UpArrow))
+        if(input.up)
         {
             isAccelerating = true;
             isDeaccelerating = false;
             jetSprite.enabled = true;
         }
-        else if (Input.GetKey(KeyCode.DownArrow))
+        else if (input.down)
         {
             isAccelerating = false;
             isDeaccelerating = true;
@@ -57,11 +69,11 @@ public class PlayerMovement : MonoBehaviour
             jetSprite.enabled = false;
         }
     }
-    private void RotateShip()
+    private void RotateShip(NetworkInputData input)
     {
-        if (Input.GetKey(KeyCode.LeftArrow))
-            transform.Rotate(rotationSpeed * Time.deltaTime * transform.forward);
-        else if (Input.GetKey(KeyCode.RightArrow))
-            transform.Rotate(-rotationSpeed * Time.deltaTime * transform.forward);
+        if (input.left)
+            transform.Rotate(rotationSpeed * Runner.DeltaTime * transform.forward);
+        else if (input.right)
+            transform.Rotate(-rotationSpeed * Runner.DeltaTime * transform.forward);
     }
 }
