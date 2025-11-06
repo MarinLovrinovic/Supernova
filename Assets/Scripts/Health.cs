@@ -26,6 +26,8 @@ public class Health : MonoBehaviour {
 				healthPoints = respawnHealthPoints;
 			} else {
 				isAlive = false;
+
+				if (gameObject.CompareTag("Player")) GameController.Instance.PlayerDestroyed(gameObject);
 				
 				switch(onLivesGone)
 				{ 

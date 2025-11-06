@@ -4,18 +4,42 @@ using UnityEngine;
 
 public class AsteroidSpawner : MonoBehaviour
 {
+    public static AsteroidSpawner Instance { get; private set; }
+
     public int number;
     public int depth;
-    [SerializeField] private GameObject asteroidPrefab;
+    public GameObject asteroidPrefab;
 
-    private GameObject[] asteroids;
+    private List<GameObject> rootAsteroids;
     private GameObject asteroidContainer;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        rootAsteroids = new List<GameObject>();
+        asteroidContainer = new GameObject("AsteroidContainer");
+    }
 
     void Start()
     {
-        asteroids = new GameObject[number];
-        asteroidContainer = new GameObject("AsteroidContainer");
+        
+    }
 
+    void Update()
+    {
+        
+    }
+
+    public void SpawnAsteroids()
+    {
         Camera camera = Camera.main;
 
         for (int i = 0; i < number; i++)
@@ -24,15 +48,26 @@ public class AsteroidSpawner : MonoBehaviour
             Vector3 worldPosition = camera.ViewportToWorldPoint(viewportPosition);
             worldPosition.z = 0.0f;
 
-            GameObject asteroid = CreateAsteroidTree(worldPosition);
-            asteroid.transform.SetParent(asteroidContainer.transform, worldPositionStays: true);
-            asteroids[i] = asteroid;
+            GameObject rootAsteroid = CreateAsteroidTree(worldPosition);
+            rootAsteroid.transform.SetParent(asteroidContainer.transform, worldPositionStays: true);
+            rootAsteroids.Add(rootAsteroid);
         }
     }
 
-    void Update()
+    public void DespawnAsteroids()
     {
-        
+        if (rootAsteroids.Count == 0)
+        {
+            Debug.Log("There are no root asteroids!");
+            return;
+        }
+
+        for (int i = 0; i < rootAsteroids.Count; i++)
+        {
+            Destroy(rootAsteroids[i]);
+        }
+
+        rootAsteroids.Clear();
     }
 
     GameObject CreateAsteroidTree(Vector3 worldPos)
