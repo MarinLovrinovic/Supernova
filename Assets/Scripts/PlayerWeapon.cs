@@ -1,6 +1,7 @@
 using System.Text;
 using UnityEditor.Search;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerWeapon : MonoBehaviour
 {
@@ -8,33 +9,45 @@ public class PlayerWeapon : MonoBehaviour
     [SerializeField] private Transform firingPoint;
     [SerializeField] private float fireRate;
     [SerializeField] private float fireTimer;
-        
-    private Rigidbody2D weapon;
 
-    void Start()
+    private PlayerControls pc;
+    private bool isShooting;
+
+    private void Awake()
     {
-            
-        weapon = GetComponent<Rigidbody2D>();
+        pc = new PlayerControls();
+
+        pc.Gameplay.Shoot.performed += ctx => isShooting = true;
+        pc.Gameplay.Shoot.canceled += ctx => isShooting = false;
     }
-        
+
+    private void OnEnable() => pc.Enable();
+    private void OnDisable() => pc.Disable();
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && fireTimer <= 0) //OVO JE AKO SVAKI KLIK JEDAN METAK
-        //if (Input.GetKey(KeyCode.Space) && fireTimer <= 0) OVO JE AKO OCEMO DA PUCA CONTINUINIRANO
+        if (fireTimer > 0f)
+        {
+            fireTimer -= Time.deltaTime;
+        }
+
+        if (isShooting && fireTimer <= 0f)
         {
             ShootWeapon();
             fireTimer = fireRate;
-        }
-        else
-        {
-            fireTimer -= Time.deltaTime;
         }
     }
 
 
     private void ShootWeapon()
     {
-        GameObject projectile = Instantiate(projectilePrefab, firingPoint.position, firingPoint.rotation); //+ transform.up * 1.0f
+        if (projectilePrefab == null || firingPoint == null)
+        {
+            Debug.LogWarning("Projectile prefab or firing point not assigned!");
+            return;
+        }
+
+        GameObject projectile = Instantiate(projectilePrefab, firingPoint.position, firingPoint.rotation);
 
         Projectile script = projectile.GetComponent<Projectile>();
         if (script != null) script.owner = this.gameObject;
