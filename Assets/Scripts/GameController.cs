@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class GameController : MonoBehaviour
     public GameObject defaultPlayerPrefab;
     public GameObject defaultWeaponPrefab;
     public GameObject defaultShieldPrefab;
+    public GameObject upgradeShopPrefab;
 
     private List<GameObject> livePlayers;
     private List<PlayerData> playerData;
@@ -48,6 +50,12 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
+        // if (Input.GetKeyDown(KeyCode.Q))//samo za testiranje NE DIRAJ ZA SAD
+        // {
+        //     ShopEnd();
+        // }
+        
+        
         if (battlePhaseActive)
         {
             if (livePlayers.Count == 1) RoundEnd();
@@ -112,6 +120,13 @@ public class GameController : MonoBehaviour
 
     private void ShopEnd()
     {
+        
+        var existingShop = FindObjectOfType<UpgradeShop>();
+        if (existingShop != null)
+            Destroy(existingShop.gameObject);
+
+        var clone = Instantiate(upgradeShopPrefab, Vector3.zero, Quaternion.identity);
+        Debug.Log("Shop end");
         SpawnPlayers();
         AsteroidSpawner.Instance.SpawnAsteroids();
         battlePhaseActive = true;
