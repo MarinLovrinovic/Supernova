@@ -8,9 +8,17 @@ using UnityEngine.UI;
 public class UpgradeShop : MonoBehaviour
 {
     [SerializeField] private Transform buttonContainer;
+    [SerializeField] private Transform Panel;
     [SerializeField] private Button buttonPrefab;
+    [SerializeField] private Button acceptButtonPrefab;
     [SerializeField] private Sprite[] UpgradeSprites;
     [SerializeField] private int numberOfUpgradesDisplayed;
+    
+    private Upgrades chosenUpgrade;                          
+    public bool upgradeIsSelected { get; private set; } = false; 
+    public bool accept { get; private set; } = false;
+    public Upgrades GetLastSelectedUpgrade() => chosenUpgrade;
+    public event Action<Upgrades> UpgradeChosen; 
     
     void Start()
     {
@@ -18,8 +26,6 @@ public class UpgradeShop : MonoBehaviour
         SpawnButtons(numberOfUpgradesDisplayed);
             
     }
-    
-    
     
     T[] GetRandomEnumValues<T>(int count)
     {
@@ -37,20 +43,30 @@ public class UpgradeShop : MonoBehaviour
         Debug.Log("Spawn Buttons");
         var randomUpgrades = GetRandomEnumValues<Upgrades>(count);
         int i = 0;
+
+        var acceptButton = Instantiate(acceptButtonPrefab);
+        acceptButton.transform.SetParent(Panel, false);
+        acceptButton.gameObject.SetActive(true);
         
+        
+        var acceptButtonText = acceptButton.GetComponentInChildren<TMP_Text>();
+        if (acceptButtonText != null) acceptButtonText.text = "Accept";
+        
+        
+        
+            
         foreach (var upgrade in randomUpgrades)
         {
             Debug.Log("upgrade loop: " + upgrade.ToString());
             
-            var button = Instantiate(buttonPrefab);
-            button.transform.SetParent(buttonContainer, false);
-            button.gameObject.SetActive(true);
+            var upgradeButton = Instantiate(buttonPrefab);
+            upgradeButton.transform.SetParent(buttonContainer, false);
+            upgradeButton.gameObject.SetActive(true);
             
-            var rt = button.GetComponent<RectTransform>();
+            var rt = upgradeButton.GetComponent<RectTransform>();
             
             if (rt != null)
             {
-                Debug.Log("rt != null");
                 rt.localScale = Vector3.one;
                 if (rt.sizeDelta == Vector2.zero)
                 {
@@ -59,32 +75,51 @@ public class UpgradeShop : MonoBehaviour
                              
             }
             
-            var img = button.GetComponent<Image>();
+            var img = upgradeButton.GetComponent<Image>();
             
             if (img != null)
             {
                 int idx = (int)(object)upgrade;
-                Debug.Log("img != null: " + idx);
                 
                 if (UpgradeSprites != null && idx >= 0 && idx < UpgradeSprites.Length)
                     img.sprite = UpgradeSprites[idx];
                 img.preserveAspect = true;
             }
             
-            // var textBox = button.GetComponentInChildren<TMP_Text>();
-            // if (textBox != null) textBox.text = upgrade.ToString();
+            var upgradeButtonText = upgradeButton.GetComponentInChildren<TMP_Text>();
+            if (upgradeButtonText != null) upgradeButtonText.text = "";
             
             
             var captured = upgrade;
-            button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(() =>
+            upgradeButton.onClick.RemoveAllListeners();
+            
+            upgradeButton.onClick.AddListener(() =>
             {
                 Debug.Log($"Clicked {captured}");
-                // do something with `captured`
+                chosenUpgrade = captured;        
+                upgradeIsSelected = true;            
+                // UpgradeChosen?.Invoke(captured);
+                
+                // var gameController = GameController.Instance; 
+                // if (gameController != null)                   
+                // {                                           
+                //     gameController.StoreUpgradeAndCloseShop(upgrade); 
+                // }              
             });
-            
             i++;
         }
+        
+        acceptButton.onClick.AddListener(() =>
+        {
+            Debug.Log($"Clicked Accept");
+                
+            var gameController = GameController.Instance; 
+            if (gameController != null && upgradeIsSelected)                   
+            {                                           
+                gameController.StoreUpgradeAndCloseShop(chosenUpgrade); 
+            }              
+        });
+        
         
         var contRt = buttonContainer as RectTransform;
         if (contRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(contRt);

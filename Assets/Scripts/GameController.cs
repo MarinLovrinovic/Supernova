@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour
     private List<GameObject> livePlayers;
     private List<PlayerData> playerData;
     private bool battlePhaseActive;
+    private Upgrades chosenUpgrade;
 
     private Vector3 topRightPos;
     private Vector3 bottomLeftPos;
@@ -50,10 +51,10 @@ public class GameController : MonoBehaviour
 
     void Update()
     {
-        // if (Input.GetKeyDown(KeyCode.Q))//samo za testiranje NE DIRAJ ZA SAD
-        // {
-        //     ShopEnd();
-        // }
+        if (Input.GetKeyDown(KeyCode.Q))//samo za testiranje NE DIRAJ ZA SAD
+        {
+            ShopEnd();
+        }
         
         
         if (battlePhaseActive)
@@ -62,7 +63,7 @@ public class GameController : MonoBehaviour
         }
         else
         {
-            ShopEnd();  //TODO: Napravit logiku za shopping fazu, zasad samo odma zavrsi i krece nova battle faza
+            // ShopEnd();  //TODO: Napravit logiku za shopping fazu, zasad samo odma zavrsi i krece nova battle faza
         }
     }
 
@@ -122,13 +123,39 @@ public class GameController : MonoBehaviour
     {
         
         var existingShop = FindObjectOfType<UpgradeShop>();
+        
         if (existingShop != null)
             Destroy(existingShop.gameObject);
 
         var clone = Instantiate(upgradeShopPrefab, Vector3.zero, Quaternion.identity);
+        
+        var canvas = clone.GetComponent<Canvas>();
+        if (canvas != null)
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.worldCamera = Camera.main;
+            canvas.sortingOrder = 100;
+            
+        }
+        
         Debug.Log("Shop end");
         SpawnPlayers();
         AsteroidSpawner.Instance.SpawnAsteroids();
         battlePhaseActive = true;
+        
+    }
+    
+    public void StoreUpgradeAndCloseShop(Upgrades selected)
+    {
+        chosenUpgrade = selected;
+        Debug.Log("Stored last upgrade: " + chosenUpgrade);
+
+        
+        var shop = FindObjectOfType<UpgradeShop>();
+        if (shop != null)
+            Destroy(shop.gameObject);
+
+        
+        
     }
 }
