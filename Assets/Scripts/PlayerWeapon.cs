@@ -1,55 +1,53 @@
-using System.Text;
-using UnityEditor.Search;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using Fusion;
 
-public class PlayerWeapon : MonoBehaviour
+namespace DefaultNamespace
 {
-    [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private Transform firingPoint;
-    [SerializeField] private float fireRate;
-    [SerializeField] private float fireTimer;
-
-    private PlayerControls pc;
-    private bool isShooting;
-
-    private void Awake()
+    public class PlayerWeapon : NetworkBehaviour
     {
-        pc = new PlayerControls();
+        [SerializeField] private NetworkPrefabRef projectilePrefab;
+        [SerializeField] private Transform firingPoint;
+        [SerializeField] private float fireRate;
+        [SerializeField] private float fireTimer;
 
-        pc.Gameplay.Shoot.performed += ctx => isShooting = true;
-        pc.Gameplay.Shoot.canceled += ctx => isShooting = false;
-    }
+        [Networked] private NetworkButtons _buttonsPrevious { get; set; }
+        [Networked] private TickTimer _shootCooldown { get; set; }
 
-    private void OnEnable() => pc.Enable();
-    private void OnDisable() => pc.Disable();
-
-    void Update()
-    {
-        if (fireTimer > 0f)
+        private Rigidbody2D rbWeapon;
+        public override void Spawned()
         {
-            fireTimer -= Time.deltaTime;
+            rbWeapon = GetComponent<Rigidbody2D>();
         }
 
-        if (isShooting && fireTimer <= 0f)
+        public override void FixedUpdateNetwork()
         {
-            ShootWeapon();
-            fireTimer = fireRate;
-        }
-    }
-
-
-    private void ShootWeapon()
-    {
-        if (projectilePrefab == null || firingPoint == null)
-        {
-            Debug.LogWarning("Projectile prefab or firing point not assigned!");
-            return;
+            if (Runner.TryGetInputForPlayer<NetworkInputData>(Object.InputAuthority, out var input))
+            {
+                ShootWeapon(input);
+            }
         }
 
-        GameObject projectile = Instantiate(projectilePrefab, firingPoint.position, firingPoint.rotation);
+        private void ShootWeapon(NetworkInputData input)
+        {
+            if (input.Buttons.WasPressed(_buttonsPrevious, SpaceshipButtons.Fire))
+            {
+                SpawnProjectile();
+            }
+        }
+        private void SpawnProjectile()
+        {
+            if (_shootCooldown.ExpiredOrNotRunning(Runner) == false || !Runner.CanSpawn) return;
 
-        Projectile script = projectile.GetComponent<Projectile>();
-        if (script != null) script.owner = this.gameObject;
+            NetworkObject proj = Runner.Spawn(projectilePrefab, rbWeapon.position, rbWeapon.transform.rotation, Object.InputAuthority);
+
+            if (proj.TryGetComponent(out Projectile projectile))
+            {
+                projectile.projectileOwner = Object.InputAuthority;
+            }
+
+            _shootCooldown = TickTimer.CreateFromSeconds(Runner, fireRate);
+        }
+
     }
+    
 }
