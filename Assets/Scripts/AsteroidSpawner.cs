@@ -1,45 +1,34 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AsteroidSpawner : MonoBehaviour
+public class AsteroidSpawner : NetworkBehaviour
 {
     public static AsteroidSpawner Instance { get; private set; }
 
     public int number;
     public int depth;
-    public GameObject asteroidPrefab;
 
-    private List<GameObject> rootAsteroids;
-    private GameObject asteroidContainer;
+    [SerializeField] private NetworkObject asteroidPrefab;
 
+    private List<NetworkObject> rootAsteroids = new();
+
+    public override void Spawned()
+    {
+        if(Object.HasStateAuthority)
+            SpawnAsteroids();
+    }
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
         Instance = this;
-        DontDestroyOnLoad(gameObject);
-
-        rootAsteroids = new List<GameObject>();
-        asteroidContainer = new GameObject("AsteroidContainer");
-    }
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
     }
 
     public void SpawnAsteroids()
     {
+        if (!Object.HasStateAuthority)
+            return;
+
         Camera camera = Camera.main;
 
         for (int i = 0; i < number; i++)
@@ -48,37 +37,26 @@ public class AsteroidSpawner : MonoBehaviour
             Vector3 worldPosition = camera.ViewportToWorldPoint(viewportPosition);
             worldPosition.z = 0.0f;
 
-            GameObject rootAsteroid = CreateAsteroidTree(worldPosition);
-            rootAsteroid.transform.SetParent(asteroidContainer.transform, worldPositionStays: true);
+            NetworkObject rootAsteroid = Runner.Spawn(asteroidPrefab, worldPosition, Quaternion.Euler(0, 0, Random.Range(0, 360)));
             rootAsteroids.Add(rootAsteroid);
+
+            TreeNode node = rootAsteroid.GetComponent<TreeNode>();
+            if (node != null)
+                node.SpawnChildrenRpc(depth);
         }
     }
 
     public void DespawnAsteroids()
     {
-        if (rootAsteroids.Count == 0)
-        {
-            Debug.Log("There are no root asteroids!");
+        if (!Object.HasStateAuthority)
             return;
-        }
 
-        for (int i = 0; i < rootAsteroids.Count; i++)
+        foreach (var asteroid in rootAsteroids)
         {
-            Destroy(rootAsteroids[i]);
+            if (asteroid != null)
+                Runner.Despawn(asteroid);
         }
 
         rootAsteroids.Clear();
-    }
-
-    GameObject CreateAsteroidTree(Vector3 worldPos)
-    {
-        GameObject root = Instantiate(asteroidPrefab, worldPos, Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)));
-
-        if (root.GetComponent<TreeNode>() == null) return root;
-        if (depth <= 0) return root;
-
-        root.GetComponent<TreeNode>().SpawnChildren(depth, root, asteroidPrefab);
-
-        return root;
     }
 }

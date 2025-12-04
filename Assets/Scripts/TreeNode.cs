@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
+using Fusion;
 using UnityEngine;
 
-public class TreeNode : MonoBehaviour
+public class TreeNode : NetworkBehaviour
 {
+    [SerializeField] private NetworkPrefabRef _treePrefab;
+
     public float relativeDepthScale = 0.5f;
     public float relativeOffset = 1.0f;
     public bool keepRelativePos = true;
@@ -12,40 +12,44 @@ public class TreeNode : MonoBehaviour
     private TreeNode leftChild;
     private TreeNode rightChild;
 
-    void Start()
+    private TreeNode SpawnChild()
     {
-        
+        Vector3 offset = new Vector3(
+            Random.Range(-relativeOffset, relativeOffset),
+            Random.Range(-relativeOffset, relativeOffset),
+            0.0f);
+
+        NetworkObject obj = Runner.Spawn(
+            _treePrefab,
+            transform.position + offset,
+            Quaternion.Euler(0, 0, Random.Range(0, 360)));
+
+        obj.transform.localScale = transform.localScale * relativeDepthScale;
+        obj.transform.SetParent(transform, worldPositionStays: keepRelativePos);
+
+        return obj.GetComponent<TreeNode>();
     }
 
-    void Update()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+    public void SpawnChildrenRpc(int depth)
     {
-        
+        SpawnChildren(depth);
     }
 
-    GameObject SpawnChild(TreeNode child, GameObject parentObj, GameObject parentPrefab)
+    public void SpawnChildren(int depth)
     {
-        Vector3 offset = new Vector3(Random.Range(-relativeOffset, relativeOffset), Random.Range(-relativeOffset, relativeOffset), 0.0f);
-        GameObject childObj = Instantiate(parentPrefab, parentObj.transform.position + offset, Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)));
-        childObj.transform.localScale = parentObj.transform.localScale * relativeDepthScale;
-        childObj.transform.SetParent(parentObj.transform, worldPositionStays: keepRelativePos);
+        if (depth <= 0)
+            return;
 
-        child = childObj.GetComponent<TreeNode>();
-
-        return childObj;
-    }
-
-    public void SpawnChildren(int depth, GameObject parentObj, GameObject parentPrefab)
-    {
-        GameObject leftObj = SpawnChild(leftChild, parentObj, parentPrefab);
-        GameObject rightObj = SpawnChild(rightChild, parentObj, parentPrefab);
+        leftChild = SpawnChild();
+        rightChild = SpawnChild();
 
         depth--;
 
         if (depth > 0)
         {
-            leftObj.GetComponent<TreeNode>().SpawnChildren(depth, leftObj, parentPrefab);
-            rightObj.GetComponent<TreeNode>().SpawnChildren(depth, rightObj, parentPrefab);
+            leftChild.SpawnChildren(depth);
+            rightChild.SpawnChildren(depth);
         }
-
     }
 }

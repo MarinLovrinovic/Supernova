@@ -1,66 +1,77 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using Fusion;
+using Fusion.Addons.Physics;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
 
     public float thrustForceAcceleration = 1f;
     public float thrustForceDeacceleration = .5f;
     public float rotationSpeed = 1f;
-    public float maxVelocity = 10f;
-    public SpriteRenderer jetSprite;
+    [SerializeField]
+    private float maxVelocity = 10f;
 
     private Rigidbody2D rb;
-    private PlayerControls pc;
+    [Networked] private NetworkRigidbody2D rbNetwork { get; set; }
 
-    private bool isThrusting = false;
-    private bool isBraking = false;
-    private float rotationInput = 0.0f;
+    private bool isAccelerating = false;
+    private bool isDeaccelerating = false;
 
-    private void Awake()
+    public SpriteRenderer jetSprite;
+
+    public override void Spawned()
     {
         rb = GetComponent<Rigidbody2D>();
-        pc = new PlayerControls();
-
-        pc.Gameplay.Rotate.performed += ctx => rotationInput = ctx.ReadValue<float>();
-        pc.Gameplay.Rotate.canceled += ctx => rotationInput = 0.0f;
-
-        pc.Gameplay.Thrust.performed += ctx => isThrusting = true;
-        pc.Gameplay.Thrust.canceled += ctx => isThrusting = false;
-
-        pc.Gameplay.Brake.performed += ctx => isBraking = true;
-        pc.Gameplay.Brake.canceled += ctx => isBraking = false;
-    }
-
-    private void OnEnable() => pc.Enable();
-    private void OnDisable() => pc.Disable();
-
-    private void Start()
-    {
+        rbNetwork = rb.GetComponent<NetworkRigidbody2D>();
         jetSprite.enabled = false;
     }
-
-    private void FixedUpdate()
+    public override void FixedUpdateNetwork()
     {
-        if (isThrusting)
+        if (Runner.TryGetInputForPlayer<NetworkInputData>(Object.InputAuthority, out var input))
         {
-            rb.AddForce(transform.up * thrustForceAcceleration);
+            AccelerateShip(input);
+            RotateShip(input);
+        }
+
+        if (Object.HasStateAuthority)
+        {
+            if (isAccelerating)
+                rb.AddForce(thrustForceAcceleration * transform.up);
+            else if (isDeaccelerating)
+                rb.AddForce(-thrustForceDeacceleration * rb.velocity);
+
+            rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxVelocity);
+        } 
+    }
+
+    private void AccelerateShip(NetworkInputData input)
+    {
+        if(input.up)
+        {
+            isAccelerating = true;
+            isDeaccelerating = false;
             jetSprite.enabled = true;
         }
-        else if (isBraking)
+        else if (input.down)
         {
-            rb.AddForce(-rb.velocity * thrustForceDeacceleration);
+            isAccelerating = false;
+            isDeaccelerating = true;
             jetSprite.enabled = false;
         }
         else
         {
+            isAccelerating = false;
+            isDeaccelerating = false;
             jetSprite.enabled = false;
         }
-
-        rb.velocity = Vector2.ClampMagnitude(rb.velocity, maxVelocity);
-
-        rb.MoveRotation(rb.rotation + rotationInput * rotationSpeed * Time.fixedDeltaTime);
+    }
+    private void RotateShip(NetworkInputData input)
+    {
+        if (input.left)
+            transform.Rotate(rotationSpeed * Runner.DeltaTime * transform.forward);
+        else if (input.right)
+            transform.Rotate(-rotationSpeed * Runner.DeltaTime * transform.forward);
     }
 }

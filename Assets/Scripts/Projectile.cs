@@ -1,52 +1,59 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Search;
 using UnityEngine;
+using Fusion;
+using Fusion.Addons.Physics;
 
-public class Projectile : MonoBehaviour
+public class Projectile : NetworkBehaviour
 {
-    public GameObject owner;
-    public float speed = 10f;
-    public float lifeTime = 10f;
-    public float damageAmount = 10.0f;
-    public bool damageOnTrigger = true;
-    
-    private Rigidbody2D body;
-
-    void Start()
+    [SerializeField] float speed = 10f;
+    [SerializeField] float lifeTime = 1f;
+    public GameObject[] respawns;
+    public float damageAmount = 10f;
+    [Networked] private TickTimer currentLifeTime { get; set; }
+    [Networked] public PlayerRef projectileOwner { get; set; }
+    public override void Spawned()
     {
-        body = GetComponent<Rigidbody2D>();
-        Destroy(gameObject, lifeTime);
+        if (Object.HasStateAuthority == false) return;
+
+        currentLifeTime = TickTimer.CreateFromSeconds(Runner, lifeTime);
+
+        if (TryGetComponent(out Rigidbody2D rb))
+        {
+            rb.velocity = transform.up * speed;
+        }
+    }
+    public override void FixedUpdateNetwork()
+    {
+        CheckLifetime();
     }
 
-    private void FixedUpdate()
+    private void CheckLifetime()
     {
-        body.velocity = transform.up * speed;
+        if (!currentLifeTime.Expired(Runner)) return;
+
+        Runner.Despawn(Object);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (IsOwnedBy(other.gameObject)) return;
+        if (!Object.HasStateAuthority) 
+            return;
 
-        if (damageOnTrigger)
+        if (!other.CompareTag("Player"))
+            Runner.Despawn(Object);
+
+        var netObj = other.GetComponent<NetworkObject>();
+        if (netObj != null && netObj.InputAuthority == projectileOwner) 
+            return;
+
+        var health = other.GetComponent<Health>();
+        if (health != null && health.isAlive)
         {
-            if (other.gameObject.GetComponent<Health>() != null)
-            {
-                other.gameObject.GetComponent<Health>().ApplyDamage(damageAmount);
-            }
+            health.ApplyDamage(damageAmount);
         }
 
-        Destroy(gameObject);
+        Runner.Despawn(Object);
     }
-
-    private bool IsOwnedBy(GameObject other)
-    {
-        if (other == null || owner == null) return true;
-        if (other == owner || other.transform.IsChildOf(owner.transform)) return true;
-
-        return false;
-    }
-    
 }
