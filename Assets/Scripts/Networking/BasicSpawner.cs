@@ -8,10 +8,22 @@ using static NetworkInputData;
 
 public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
+    public static BasicSpawner instance;
     private NetworkRunner _runner;
     [SerializeField] private NetworkPrefabRef _playerPrefab;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+    public string _playerName = null;
 
+    public void Awake()
+    {
+        if(instance == null)
+            instance = this;
+    }
+
+    public async void SubmitName(string playerName)
+    {
+        _playerName = playerName;
+    }
 
     async void StartGame(GameMode mode)
     {
