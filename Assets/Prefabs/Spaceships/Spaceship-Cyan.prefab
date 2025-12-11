@@ -19,7 +19,7 @@ GameObject:
   - component: {fileID: -6900792622281171183}
   - component: {fileID: 1349615342471104979}
   m_Layer: 0
-  m_Name: Spaceship-Blue
+  m_Name: Spaceship-Cyan
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 2e978138067a65841926189fd57001ba, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 785c5a3df8b84fb428e63fe890d9775f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -258,7 +258,7 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 2574651885
+  SortKey: 2877719488
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []

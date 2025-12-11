@@ -1,13 +1,12 @@
-public enum PlayerColor {
+public enum Color {
     Red,
-    Blue,
-    Green,
     Yellow,
-    Pink,
-    Orange,
+    Lime,
+    Green,
     Cyan,
+    Blue,
     Purple,
-    Lime
+    Pink
 }
 
 // 203f6949-8ca3-4ba7-b0d1-5e43b67c56e2
