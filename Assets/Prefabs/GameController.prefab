@@ -44,3 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77ec09835b646e84a8d3c0dbc57bdf02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerNumber: 0
+  playerContainer: {fileID: 0}
+  defaultPlayerPrefab: {fileID: 1029672585926967827, guid: ef0935d093b5f4f49b4e0ac4abda0986, type: 3}
+  defaultWeaponPrefab: {fileID: 2219208642778883057, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
+  defaultShieldPrefab: {fileID: 2487028466535403064, guid: 512160e2458130f4fbf2db9aa63177c3, type: 3}

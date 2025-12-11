@@ -38,6 +38,12 @@ namespace DefaultNamespace
         {
             if (_shootCooldown.ExpiredOrNotRunning(Runner) == false || !Runner.CanSpawn) return;
 
+            if (!projectilePrefab.IsValid)
+            {
+                Debug.LogError("Projectile prefab is not set or not registered in NetworkProjectConfig!");
+                return;
+            }
+
             NetworkObject proj = Runner.Spawn(projectilePrefab, rbWeapon.position, rbWeapon.transform.rotation, Object.InputAuthority);
 
             if (proj.TryGetComponent(out Projectile projectile))
