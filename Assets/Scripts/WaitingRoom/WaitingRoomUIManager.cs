@@ -6,10 +6,11 @@ using UnityEngine.UI;
 using TMPro;
 
 
+// ovo je spojeno na UI canvas i mijenja elemente na osnovu info iz waiting room managera
 public class WaitingRoomUIManager : MonoBehaviour
 {
-    private static WaitingRoomManager _instance;
-    public static WaitingRoomManager Instance => _instance;
+    private static WaitingRoomUIManager _instance;
+    public static WaitingRoomUIManager Instance => _instance;
 
     [Header("Waiting Room Elements")]
     [SerializeField] private TMP_Text  roomCodeText;
@@ -23,27 +24,20 @@ public class WaitingRoomUIManager : MonoBehaviour
 
     [Header("Customization")]
     [SerializeField] private GameObject customizationPanel;
-    public List<Button> colorButtons;
 
 
     private void Start()
     {
+        _instance = this;
+
         readyButton.onClick.AddListener(OnReadyClicked);
         customizeButton.onClick.AddListener(OpenCustomization);
         settingsButton.onClick.AddListener(OpenSettings);
-
-
-        for (int i = 0; i < colorButtons.Count; i++)
-        {
-            int index = i; 
-            colorButtons[i].onClick.AddListener(() => ChangeColor(index));
-        }
-
     }
 
     private void OnReadyClicked()
     {
-        WaitingRoomManager.Instance.SetPlayerReady();
+       WaitingRoomManager.Instance.SetPlayerReady();
     }
 
     private void OpenCustomization()
@@ -56,18 +50,14 @@ public class WaitingRoomUIManager : MonoBehaviour
         // todo
     }
 
-    private void ChangeColor(int index)
-    {
-        WaitingRoomManager.Instance.ChangePlayerColor(index);
-    }
-
     public void UpdateTimer(int timeRemaining)
     {
         timerText.text = Mathf.CeilToInt(timeRemaining).ToString();
     }
-    public void UpdatePlayersJoined(int totalCount)
+
+    public void UpdatePlayersJoined(int totalCount, int maxCount)
     {
-        playersJoined.text = totalCount.ToString() + "/6";
+        playersJoined.text = totalCount.ToString() + "/" + maxCount.ToString();
     }
 
     public void UpdatePlayersReady(int readyCount, int totalCount)
@@ -75,9 +65,9 @@ public class WaitingRoomUIManager : MonoBehaviour
         playersReady.text = readyCount.ToString() + "/" + totalCount.ToString();
     }
 
-
     public void SetRoomCode(string code)
     {
-        roomCodeText.text = code;
+        roomCode.text = code;
+        Debug.Log(code);
     }
 }
