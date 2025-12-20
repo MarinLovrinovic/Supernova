@@ -7,59 +7,70 @@ using UnityEngine.SceneManagement;
 using static NetworkInputData;
 using UnityEngine.UI;
 using Random = System.Random;
+using Fusion.Addons.Physics;
 
+
+public interface IPlayerSpawnerHandler
+{
+    void OnPlayerSpawned(NetworkObject player, PlayerRef playerRef);
+}
 
 public class SpaceshipSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
-    private WaitingRoomManager _waitingRoomManager = null;
     [SerializeField] private NetworkPrefabRef _playerPrefab;
-    private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+    private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new();
+    private IPlayerSpawnerHandler _handler;
+    private GameScene _scene;
 
 
 
     // ovo zove waiting room manager da ne bi bilo problema s redoslijedom spawnanja
-    public void StartSpaceshipSpawner(WaitingRoomManager waitingRoomManager)
+    public void Initialize(GameScene scene, IPlayerSpawnerHandler handler = null)
     {
-        _waitingRoomManager = WaitingRoomManager.Instance;
+        _scene = scene;
+        _handler = handler;
+
     }
+
 
     // poziva se kad se igrac pridruzi
     private void SpawnSpaceship(NetworkRunner runner, PlayerRef player)
     {
         Vector3 spawnPosition = GetRandomSpawnPosition();
-        NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
 
-
-        _spawnedCharacters.Add(player, networkPlayerObject);
-
-
-        // runner mora znat sve igrace
-        runner.SetPlayerObject(player, networkPlayerObject);
-        var data = networkPlayerObject.GetComponent<PlayerNetworkData>();
-
-
-        // svaki igrac postavi svoj lokalni PlayerNetworkData
-        if (player == runner.LocalPlayer)
+        if (!runner.TryGetPlayerObject(player, out var playerObject))
         {
-            WaitingRoomManager.Instance.SetLocalPlayer(data);
+            playerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+            runner.SetPlayerObject(player, playerObject);
+        }
+        
+        _spawnedCharacters.Add(player, playerObject);
+
+        Debug.Log($"[SpaceshipSpawner] Spawned player {player} at {spawnPosition}");
+
+
+        var nrb = playerObject.GetComponent<NetworkRigidbody2D>();
+        if (nrb != null)
+        {
+            float currentZRotation = playerObject.transform.eulerAngles.z;
+            nrb.Teleport(spawnPosition, Quaternion.Euler(0, 0, currentZRotation));
         }
 
 
-        // obavijesti waiting room manager o novom igracu
-        if (_waitingRoomManager != null)
-        {
-            var playerNetworkData = networkPlayerObject.GetComponent<PlayerNetworkData>();
-            _waitingRoomManager.AddPlayer(playerNetworkData.Id);
-        }
+
+
+        // zovi handler za scene-specific akcije
+        _handler?.OnPlayerSpawned(playerObject, player);
     }
 
 
     // da se ne spawnaju svi na isto mjesto
     private Vector3 GetRandomSpawnPosition()
     {
-        float x = UnityEngine.Random.Range(-10f, 10f);
-        float y = UnityEngine.Random.Range(-10f, 10f);
-        return new Vector3(x, y, 0);
+        float range = 10f; // udaljenost od spawner-a
+        float x = UnityEngine.Random.Range(-range, range);
+        float y = UnityEngine.Random.Range(-range, range);
+        return transform.position + new Vector3(x, y, 0);
     }
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
@@ -83,7 +94,7 @@ public class SpaceshipSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         var localInput = new NetworkInputData();
         //Debug.Log("[SpaceshipSpawner.OnInput] ");
-        
+
 
         localInput.up = Input.GetKey(KeyCode.UpArrow);
         localInput.down = Input.GetKey(KeyCode.DownArrow);
@@ -92,7 +103,7 @@ public class SpaceshipSpawner : MonoBehaviour, INetworkRunnerCallbacks
         //localInput.Buttons.Set(SpaceshipButtons.Fire, Input.GetButton("Jump")); 
 
         input.Set(localInput);
- 
+
     }
 
 

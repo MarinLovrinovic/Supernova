@@ -1,14 +1,8 @@
 using Fusion;
-using Fusion.Sockets;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static NetworkInputData;
 using UnityEngine.UI;
 using Random = System.Random;
-using Mono.Cecil.Cil;
-using TMPro.EditorUtilities;
 using TMPro;
 
 

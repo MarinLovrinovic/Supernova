@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = System.Random;
 using TMPro;
 
 
@@ -37,7 +37,10 @@ public class WaitingRoomUIManager : MonoBehaviour
 
     private void OnReadyClicked()
     {
-       WaitingRoomManager.Instance.SetPlayerReady();
+        if (!WaitingRoomManager.Instance)
+            return;
+       //WaitingRoomManager.Instance.SetPlayerReady();
+       WaitingRoomManager.Instance.StartBattleScene();
     }
 
     private void OpenCustomization()

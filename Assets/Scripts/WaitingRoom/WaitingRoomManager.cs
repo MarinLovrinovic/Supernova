@@ -1,95 +1,105 @@
 using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Collections;
-using UnityEngine.SocialPlatforms;
-using Unity.VisualScripting;
-using UnityEngine.UI;
 
 
 
-public class WaitingRoomManager : NetworkBehaviour
+
+public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
 {
-    private static WaitingRoomManager _instance;
-    public static WaitingRoomManager Instance => _instance;
-
     [SerializeField] private NetworkPrefabRef _waitingRoomManagerPrefab;
+    public static WaitingRoomManager Instance;
     public PlayerNetworkData LocalPlayer { get; private set; }
-    public List<Color> availableColors;
-    [Networked, Capacity(MaxPlayers), OnChangedRender(nameof(OnColorsChanged))]
-    public NetworkArray<int> playerColors => default;
-    [Networked, OnChangedRender(nameof(OnTimeChanged))] public int timeRemaining { get; private set; }
-    private float _countdownAccumulator = 0f;
-    private int _readyPlayersCount = 0;
-    private bool _initialized = false;
+
+    private readonly List<NetworkBehaviourId> players = new();
+
+
+    [Networked, OnChangedRender(nameof(OnTimeChanged))]
+    public int TimeRemaining { get; private set; }
+    private float _timerAcc = 0f;
+    private int readyCount = 0;
     private const int MaxPlayers = 6;
-
-
-    private List<NetworkBehaviourId> _playerNetworkDataIds = new List<NetworkBehaviourId>();
-
 
 
     public override void Spawned()
     {
-        _instance = this;
+        Instance = this;
+
         var roomCode = Runner.SessionInfo.Name;
-        Debug.Log("Room code: " + roomCode);
-
-        WaitingRoomUIManager.Instance.SetRoomCode(roomCode);
-
+        Debug.Log("[WRM.Spawned] Room code: " + roomCode);
 
         // inicijalizacija spaceship spawnera
         var spawner = FindObjectOfType<SpaceshipSpawner>();
         Runner.AddCallbacks(spawner);
-        spawner.StartSpaceshipSpawner(this);
+        spawner.Initialize(GameScene.WaitingRoom, this);
+
+        foreach (var player in Runner.ActivePlayers)
+        {
+            if (!Runner.TryGetPlayerObject(player, out var playerObj))
+                continue;
+
+            var playerData = playerObj.GetComponent<PlayerNetworkData>();
+
+            // svaki igrac postavi svoj lokalni PlayerNetworkData kad se spawna
+            if (player == Runner.LocalPlayer)
+            {
+                LocalPlayer = playerData;
+            }
+
+            players.Add(playerData.Id);
+        }
 
 
-        timeRemaining = 180; // 3 minute i onda pocinje igra
-        _countdownAccumulator = 0f;
-
-
-        var colors = playerColors; // bez ovog koraka bude greska
         if (Object.HasStateAuthority)
         {
-            // reset boja na -1 samo prvi put
-            if (!_initialized)
-            {
-                for (int i = 0; i < playerColors.Length; i++)
-                    colors[i] = -1;
-
-                _initialized = true;
-            }
+            TimeRemaining = 180; // 3 minute i onda pocinje igra
+            _timerAcc = 0f;
         }
 
-        
+        RefreshUI();
     }
 
-    public override void FixedUpdateNetwork()
+    public void OnPlayerSpawned(NetworkObject networkPlayerObject, PlayerRef player)
     {
-        // timer
-        if (Object.HasStateAuthority && timeRemaining > 0)
+        var data = networkPlayerObject.GetComponent<PlayerNetworkData>();
+        if (player == Runner.LocalPlayer)
         {
-            _countdownAccumulator += Runner.DeltaTime;
-
-            if (_countdownAccumulator >= 1f)
-            {
-                _countdownAccumulator -= 1f;
-                timeRemaining--;
-            }
+            SetLocalPlayer(data);
         }
+
+        var playerNetworkData = networkPlayerObject.GetComponent<PlayerNetworkData>();
+        AddPlayer(playerNetworkData.Id);
     }
 
     public void SetLocalPlayer(PlayerNetworkData player)
     {
         Debug.Log("local player set: " + player.Id);
         LocalPlayer = player;
+
+        if (Customization.Instance != null)
+            Customization.Instance.RefreshUI();
     }
 
+
+    public override void FixedUpdateNetwork()
+    {
+        // timer
+        if (Object.HasStateAuthority && TimeRemaining > 0)
+        {
+            _timerAcc += Runner.DeltaTime;
+
+            if (_timerAcc >= 1f)
+            {
+                _timerAcc -= 1f;
+                TimeRemaining--;
+            }
+        }
+    }
 
     // funkcije za WaitingRoomUIManager
     public void OnTimeChanged()
     {
-        WaitingRoomUIManager.Instance.UpdateTimer(timeRemaining);
+        WaitingRoomUIManager.Instance.UpdateTimer(TimeRemaining);
     }
     public void SetPlayerReady()
     {
@@ -99,83 +109,72 @@ public class WaitingRoomManager : NetworkBehaviour
         LocalPlayer.SetReady(!LocalPlayer.IsReady);
 
         if (LocalPlayer.IsReady)
-            _readyPlayersCount++;
+            readyCount++;
         else
-            _readyPlayersCount--;
+            readyCount--;
 
-        WaitingRoomUIManager.Instance.UpdatePlayersReady(_readyPlayersCount, _playerNetworkDataIds.Count);
+        WaitingRoomUIManager.Instance.UpdatePlayersReady(readyCount, players.Count);
     }
-
     public void AddPlayer(NetworkBehaviourId playerNetworkDataId)
     {
         Debug.Log("player joined " + playerNetworkDataId);
-        _playerNetworkDataIds.Add(playerNetworkDataId); // manager ima uvid na sve igrace koji udu 
+        players.Add(playerNetworkDataId); // manager ima uvid na sve igrace koji udu 
 
 
-        // assigna pocetnu boju
-        Debug.Log("first free color: " + GetFirstFreeColor());
-        if (_initialized && LocalPlayer)
-            ChangePlayerColor(GetFirstFreeColor());
-
-
-        WaitingRoomUIManager.Instance.UpdatePlayersJoined(_playerNetworkDataIds.Count, MaxPlayers);
-        WaitingRoomUIManager.Instance.UpdatePlayersReady(_readyPlayersCount, _playerNetworkDataIds.Count);
+        WaitingRoomUIManager.Instance.UpdatePlayersJoined(players.Count, MaxPlayers);
+        WaitingRoomUIManager.Instance.UpdatePlayersReady(readyCount, players.Count);
     }
 
 
-    // ovo poziva i Customization kada player odabere boju
-    public void ChangePlayerColor(int index)
+
+    // pomocna funkcija za assign boje pri ulasku
+    public int GetFirstFreeColor()
     {
-        if (LocalPlayer == null)
-            return;
-
-        Debug.Log("[WRM.ChangePlayerColor] Changing color to index: " + index);
-
-        if (!Object.HasStateAuthority) // samo server moze mijenjati boje
-            return;
-
-        int p = LocalPlayer.Object.InputAuthority.PlayerId;
-        var colors = playerColors;
-        Debug.Log("[WRM.ChangePlayerColor] Current color of player " + p + " is " + colors[p]);
-
-        if (IsColorTaken(index)) {
-            Debug.Log("[WRM.ChangePlayerColor] Color " + index + " is already taken!");
-            return;
-        }
-
-        colors[p] = index;
-        LocalPlayer.SetColor(index);
-    }
-
-    public bool IsColorTaken(int index)
-    {
-        for (int i = 0; i < playerColors.Length; i++)
+        for (int i = 0; i < Customization.Instance.colorButtons.Count; i++)
         {
-            //Debug.Log("[WRM.IsColorTaken] Color at " + i + " is " + playerColors[i]);
-            if (playerColors[i] == index)
-                return true;
-        }
-        return false;
-    }
-    private int GetFirstFreeColor()
-    {
-        for (int i = 0; i < playerColors.Length; i++)
-        {
-            if (!IsColorTaken(i))
+            bool taken = false;
+
+            foreach (var player in Runner.ActivePlayers)
+            {
+                if (!Runner.TryGetPlayerObject(player, out var playerObj)) continue;
+                if (playerObj.GetComponent<PlayerNetworkData>().ColorIndex == i)
+                {
+                    taken = true;
+                    break;
+                }
+            }
+
+            if (!taken)
                 return i;
         }
-
-        return 0; // ako su sve boje zauzete (nemoguce)
+        return 0;
     }
 
-
-    // za panel u kojem se mijenjaju boje
-    public void OnColorsChanged()
+    private void RefreshUI()
     {
-        Debug.Log("Colors changed");
+        var roomCode = Runner.SessionInfo.Name;
+        WaitingRoomUIManager.Instance.SetRoomCode(roomCode);
+        WaitingRoomUIManager.Instance.UpdateTimer(TimeRemaining);
+        WaitingRoomUIManager.Instance.UpdatePlayersJoined(players.Count, MaxPlayers);
+        WaitingRoomUIManager.Instance.UpdatePlayersReady(readyCount, players.Count);
+
         if (Customization.Instance != null)
             Customization.Instance.RefreshUI();
     }
 
 
+
+
+    // privremeno za testiranje 
+    public void StartBattleScene()
+    {
+        if (Object.HasStateAuthority)
+        {
+            Runner.LoadScene("BattleScene");
+        }
+    }
+
+
+
 }
+

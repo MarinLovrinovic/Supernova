@@ -7,9 +7,9 @@ public class Customization : MonoBehaviour
 {
     public static Customization Instance;
     public List<Button> colorButtons;
-    [SerializeField] public List<Color> palette;
+    //[SerializeField] public List<Color> palette;
 
-    
+
     private void Awake()
     {
         Instance = this;
@@ -25,56 +25,66 @@ public class Customization : MonoBehaviour
         RefreshUI();
     }
 
+    private void OnColorPressed(int index)
+    {
+        var local = WaitingRoomManager.Instance.LocalPlayer;
+
+        if (local == null)
+            return;
+
+        if (!local.Object.HasInputAuthority)
+            return;
+
+        local.RPC_RequestColorChange(index);
+    }
+
+
     // da se vidi koje su boje zauzete/odabrane
     public void RefreshUI()
     {
-        var wrm = WaitingRoomManager.Instance;
-        if (!wrm) return;
+        if (!WaitingRoomManager.Instance)
+            return;
 
+        var wrm = WaitingRoomManager.Instance;
+        var runner = wrm.Runner;
         var localPlayer = wrm.LocalPlayer;
 
         if (localPlayer == null)
             return;
 
-        int localColor = localPlayer.ColorIndex;
 
+        // reset
         for (int i = 0; i < colorButtons.Count; i++)
         {
-            bool taken = wrm.IsColorTaken(i);
-            //Debug.Log("[Customization.RefreshUI] Color " + i + " taken: " + taken);
-            //Debug.Log("[Customization.RefreshUI] Local player color: " + localColor);
+            bool taken = false;
+            bool mine = false;
 
+            foreach (var p in runner.ActivePlayers)
+            {
+                if (!runner.TryGetPlayerObject(p, out var obj))
+                    continue;
 
-            // prikaz X ako je boja zauzeta od nekog drugog
-            Transform xMark = colorButtons[i].transform.Find("UnavailableX");
-            xMark?.gameObject.SetActive(taken && localColor != i);
+                var pnd = obj.GetComponent<PlayerNetworkData>();
 
+                if (pnd.ColorIndex == i)
+                {
+                    taken = true;
+                    if (pnd == localPlayer)
+                        mine = true;
+                }
+            }
 
-            // prikaz okvira ako je moja trenutna boja
-            Transform frame = colorButtons[i].transform.Find("SelectedFrame");
-            frame?.gameObject.SetActive(localColor == i);
+            // X ako je zauzeta od nekog drugog
+            colorButtons[i].transform.Find("UnavailableX")
+                ?.gameObject.SetActive(taken && !mine);
 
+            // okvir ako je moja
+            colorButtons[i].transform.Find("SelectedFrame")
+                ?.gameObject.SetActive(mine);
 
-            // onemoguci klik ako je boja zauzeta ili je to moja boja
-            Button btn = colorButtons[i];
-            btn.interactable = !taken || localColor == i;
+            // klik
+            colorButtons[i].interactable = !taken || mine;
         }
-    }
-
-
-    private void OnColorPressed(int index)
-    {
-        Debug.Log("Color changed to: " + palette[index].ToString());
-        WaitingRoomManager.Instance.ChangePlayerColor(index);
-    }
-
-
-    public static Color getColor(int index)
-    {
-        if (Instance == null || index < 0 || index >= Instance.palette.Count)
-            return Color.white;
-
-        return Instance.palette[index];
     }
 
 }
