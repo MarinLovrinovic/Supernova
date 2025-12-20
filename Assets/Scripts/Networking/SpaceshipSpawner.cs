@@ -82,14 +82,17 @@ public class SpaceshipSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var localInput = new NetworkInputData();
+        //Debug.Log("[SpaceshipSpawner.OnInput] ");
+        
 
         localInput.up = Input.GetKey(KeyCode.UpArrow);
         localInput.down = Input.GetKey(KeyCode.DownArrow);
         localInput.right = Input.GetKey(KeyCode.RightArrow);
         localInput.left = Input.GetKey(KeyCode.LeftArrow);
-        localInput.Buttons.Set(SpaceshipButtons.Fire, Input.GetButton("Jump"));
+        //localInput.Buttons.Set(SpaceshipButtons.Fire, Input.GetButton("Jump")); 
 
         input.Set(localInput);
+ 
     }
 
 

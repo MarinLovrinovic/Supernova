@@ -26,7 +26,7 @@ public class GameModeMenu : MonoBehaviour
     private void Start()
     {
         _hostButton.onClick.AddListener(() => StartGame(GameMode.Host, "", "WaitingRoom"));
-        _joinButton.onClick.AddListener(() => StartGame(GameMode.Client, _roomCodeInput.text, "WaitingRoom"));
+        _joinButton.onClick.AddListener(() => StartGame(GameMode.Client, _roomCodeInput.text.ToUpper(), "WaitingRoom"));
         //_joinButton.onClick.AddListener(() => Debug.Log("[GameModeMenu.Start] Join button clicked with code: " + _roomCodeInput.text));
     }
 
@@ -62,7 +62,6 @@ public class GameModeMenu : MonoBehaviour
             GameMode = mode,
             SessionName = code,
             //Scene = scene,
-            
         });
 
         if (_runner.IsServer)

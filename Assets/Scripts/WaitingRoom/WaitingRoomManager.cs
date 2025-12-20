@@ -60,6 +60,8 @@ public class WaitingRoomManager : NetworkBehaviour
                 _initialized = true;
             }
         }
+
+        
     }
 
     public override void FixedUpdateNetwork()
