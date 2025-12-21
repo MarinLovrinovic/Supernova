@@ -1,6 +1,7 @@
 using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
+using Fusion.Addons.Physics;
 
 
 
@@ -39,6 +40,9 @@ public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
                 continue;
 
             var playerData = playerObj.GetComponent<PlayerNetworkData>();
+
+            var nrb = playerObj.GetComponent<NetworkRigidbody2D>();
+            nrb.InterpolationTarget = null;
 
             // svaki igrac postavi svoj lokalni PlayerNetworkData kad se spawna
             if (player == Runner.LocalPlayer)
@@ -109,11 +113,33 @@ public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
         LocalPlayer.SetReady(!LocalPlayer.IsReady);
 
         if (LocalPlayer.IsReady)
+        {
             readyCount++;
+
+            // bez postavljenog InterpolationTarget na NetworkRigidbody2D dode do errora kad se prijede u Battle Scene
+            // ali klijenti se na svojim ekranima ne pomicu pravilno kad je postavljen
+            // nasilno rjesenje: kad klijent klikne ready ukljuci mu se i onda se opet iskljuci u battle
+            // ako ne nademo bolje rjesenje mozemo dodat neki loading screen za ovo
+            // HOST ZADNJI MORA READYAT (privremeno)
+            foreach (var player in Runner.ActivePlayers)
+            {
+                if (!Runner.TryGetPlayerObject(player, out var playerObject))
+                    continue;
+
+                var nrb = playerObject.GetComponent<NetworkRigidbody2D>();
+                nrb.InterpolationTarget = nrb.GetComponentInChildren<InterpolationTarget>().Target;
+            }
+
+            StartBattleScene();
+        }
         else
+        {
             readyCount--;
+        }
 
         WaitingRoomUIManager.Instance.UpdatePlayersReady(readyCount, players.Count);
+
+
     }
     public void AddPlayer(NetworkBehaviourId playerNetworkDataId)
     {
@@ -173,8 +199,6 @@ public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
             Runner.LoadScene("BattleScene");
         }
     }
-
-
 
 }
 

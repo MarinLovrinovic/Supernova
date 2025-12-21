@@ -24,7 +24,7 @@ public class SpaceshipSpawner : MonoBehaviour, INetworkRunnerCallbacks
 
 
 
-    // ovo zove waiting room manager da ne bi bilo problema s redoslijedom spawnanja
+    // ovo zove waiting room / battle manager da ne bi bilo problema s redoslijedom spawnanja
     public void Initialize(GameScene scene, IPlayerSpawnerHandler handler = null)
     {
         _scene = scene;
@@ -49,14 +49,13 @@ public class SpaceshipSpawner : MonoBehaviour, INetworkRunnerCallbacks
         Debug.Log($"[SpaceshipSpawner] Spawned player {player} at {spawnPosition}");
 
 
+        // bez ovoga NetworkRigidbody2D pravi probleme 
         var nrb = playerObject.GetComponent<NetworkRigidbody2D>();
         if (nrb != null)
         {
             float currentZRotation = playerObject.transform.eulerAngles.z;
             nrb.Teleport(spawnPosition, Quaternion.Euler(0, 0, currentZRotation));
         }
-
-
 
 
         // zovi handler za scene-specific akcije
@@ -93,14 +92,18 @@ public class SpaceshipSpawner : MonoBehaviour, INetworkRunnerCallbacks
     public void OnInput(NetworkRunner runner, NetworkInput input)
     {
         var localInput = new NetworkInputData();
-        //Debug.Log("[SpaceshipSpawner.OnInput] ");
 
 
         localInput.up = Input.GetKey(KeyCode.UpArrow);
         localInput.down = Input.GetKey(KeyCode.DownArrow);
         localInput.right = Input.GetKey(KeyCode.RightArrow);
         localInput.left = Input.GetKey(KeyCode.LeftArrow);
-        //localInput.Buttons.Set(SpaceshipButtons.Fire, Input.GetButton("Jump")); 
+
+        if (_scene == GameScene.Battle) // nema pucanja u waiting room
+        {
+            localInput.Buttons.Set(SpaceshipButtons.Fire, Input.GetButton("Jump")); 
+        }
+        
 
         input.Set(localInput);
 

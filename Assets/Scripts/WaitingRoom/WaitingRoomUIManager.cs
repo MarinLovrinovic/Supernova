@@ -39,8 +39,7 @@ public class WaitingRoomUIManager : MonoBehaviour
     {
         if (!WaitingRoomManager.Instance)
             return;
-       //WaitingRoomManager.Instance.SetPlayerReady();
-       WaitingRoomManager.Instance.StartBattleScene();
+       WaitingRoomManager.Instance.SetPlayerReady();
     }
 
     private void OpenCustomization()

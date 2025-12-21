@@ -21,7 +21,6 @@ public class GameModeMenu : MonoBehaviour
     {
         _hostButton.onClick.AddListener(() => StartGame(GameMode.Host, "", "WaitingRoom"));
         _joinButton.onClick.AddListener(() => StartGame(GameMode.Client, _roomCodeInput.text.ToUpper(), "WaitingRoom"));
-        //_joinButton.onClick.AddListener(() => Debug.Log("[GameModeMenu.Start] Join button clicked with code: " + _roomCodeInput.text));
     }
 
 

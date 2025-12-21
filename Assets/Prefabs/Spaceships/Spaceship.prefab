@@ -40,8 +40,8 @@ Transform:
   m_LocalScale: {x: 0.4, y: 0.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8743157527054111540}
   - {fileID: 4379251451902285448}
+  - {fileID: 8743157527054111540}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!50 &7623333812652437055
@@ -258,7 +258,7 @@ MonoBehaviour:
   _stateAuthorityChangeErrorCorrectionDelta: 0
   SyncScale: 0
   SyncParent: 0
-  _interpolationTarget: {fileID: 0}
+  _interpolationTarget: {fileID: 4379251451902285448}
   UsePreciseRotation: 0
   UseRenderSleepThresholds: 1
   RenderThresholds:
@@ -411,6 +411,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4379251451902285448}
+  - component: {fileID: 6252933436586703833}
   m_Layer: 0
   m_Name: InterpolationTarget
   m_TagString: Untagged
@@ -433,3 +434,16 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8542793270593861832}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6252933436586703833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8538363520470889126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 945c49f5f9efb7b4fb591dbe61684a34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 4379251451902285448}

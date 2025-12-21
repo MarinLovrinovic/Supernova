@@ -5,6 +5,7 @@ using Fusion.Addons.Physics;
 
 public class PlayerNetworkData : NetworkBehaviour
 {
+    // paleta je sad na prefabu da igraci ne ovise o customization da bi se obojali
     [SerializeField] public List<Color> palette;
     [Networked, OnChangedRender(nameof(OnColorChanged))]
     public int ColorIndex { get; set; }

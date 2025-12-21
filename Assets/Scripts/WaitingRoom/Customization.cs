@@ -7,7 +7,6 @@ public class Customization : MonoBehaviour
 {
     public static Customization Instance;
     public List<Button> colorButtons;
-    //[SerializeField] public List<Color> palette;
 
 
     private void Awake()

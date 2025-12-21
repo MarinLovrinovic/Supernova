@@ -1,6 +1,8 @@
 using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
+using Fusion.Addons.Physics;
+using System.Diagnostics.Tracing;
 
 
 
@@ -25,10 +27,16 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         Debug.Log("[BattleManager] Spawning all active players");
         foreach (var player in Runner.ActivePlayers)
         {
-            if (!Runner.TryGetPlayerObject(player, out var obj))
+            if (!Runner.TryGetPlayerObject(player, out var playerObj))
                 continue;
 
-            var playerData = obj.GetComponent<PlayerNetworkData>();
+            var playerData = playerObj.GetComponent<PlayerNetworkData>();
+
+
+            // iskljucivanje InterpolationTarget da se klijenti mogu micat
+            var nrb = playerObj.GetComponent<NetworkRigidbody2D>();
+            nrb.InterpolationTarget = null;
+        
 
 
             if (player == Runner.LocalPlayer)
@@ -40,7 +48,7 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         }
 
         //if (!Runner.IsServer)
-            //return;
+        //return;
 
 
         // inicijalizacija spaceship spawnera
