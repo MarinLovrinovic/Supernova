@@ -1,3 +1,4 @@
+using System;
 using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
@@ -12,12 +13,13 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
     [SerializeField] private NetworkPrefabRef _BattleManagerPrefab;
     public static BattleManager Instance;
     public PlayerNetworkData LocalPlayer { get; private set; }
-
     private readonly List<NetworkBehaviourId> players = new();
 
     private int readyCount = 0;
     private const int MaxPlayers = 6;
-
+    
+    [SerializeField] private string upgradeShopSceneName = "UpgradeShop";
+    [SerializeField] private string afterShopScene = "AfterShopScene"; 
 
     public override void Spawned()
     {
@@ -94,7 +96,48 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         Debug.Log("player joined " + playerNetworkDataId);
         players.Add(playerNetworkDataId); // manager ima uvid na sve igrace koji udu 
     }
+    
+    public async void LoadUpgradeShopScene()
+    {
+        if (Runner == null)
+            return;
 
+        if (Runner.IsServer)
+        {
+            await Runner.LoadScene(upgradeShopSceneName);
+        }
+    }
+    
+    public async void LoadBattleScene()
+    {
+        Debug.Log("loading battle scene");
+        if (Runner == null)
+            return;
+
+        if (Runner.IsServer)//todo ovo ovjde ne radi al nismo se jos dogovoirili kako cemo to pa cu pustit ovako, upgrade select i storing radi
+        {
+            Debug.Log("Runner.IsServer");
+            await Runner.LoadScene(afterShopScene);
+        }
+    }
+    
+    public void StoreUpgradeAndCloseShop(Upgrades selected)
+    {
+        Debug.Log("Stored last upgrade: " + selected);
+        UpgradePlayer(selected);
+        LoadBattleScene();
+        
+        
+    }
+
+    public void UpgradePlayer(Upgrades selected)
+    {
+        // switch (selected)//TODO ovdje se moraju dodat koji su svi upgradeovi i to updatead u playeru
+        // {
+        //     case Upgrades.RayGun:
+        //         break;
+        // }
+    }
 
 
 }

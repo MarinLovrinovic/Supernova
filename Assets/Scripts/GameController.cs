@@ -12,9 +12,11 @@ public class GameController : MonoBehaviour
     public GameObject defaultWeaponPrefab;
     public GameObject defaultShieldPrefab;
 
+    private BattleManager battleManager;
     private List<GameObject> livePlayers;
     private List<PlayerData> playerData;
     private bool battlePhaseActive;
+
 
     private Vector3 topRightPos;
     private Vector3 bottomLeftPos;
@@ -26,7 +28,7 @@ public class GameController : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
+        battleManager = FindObjectOfType<BattleManager>();
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
@@ -50,11 +52,20 @@ public class GameController : MonoBehaviour
     {
         if (battlePhaseActive)
         {
-            if (livePlayers.Count == 1) RoundEnd();
+            if (livePlayers.Count == 1)
+            {
+                RoundEnd();
+            }else if (Input.GetKeyDown(KeyCode.Q))
+            {
+                RoundEnd();
+                battleManager.LoadUpgradeShopScene();//TODO: za debugging
+            }
+            
         }
         else
         {
-            ShopEnd();  //TODO: Napravit logiku za shopping fazu, zasad samo odma zavrsi i krece nova battle faza
+            battleManager.LoadUpgradeShopScene();
+            // ShopEnd();  //TODO: Napravit logiku za shopping fazu, zasad samo odma zavrsi i krece nova battle faza
         }
     }
 
@@ -116,4 +127,6 @@ public class GameController : MonoBehaviour
         AsteroidSpawner.Instance.SpawnAsteroids();
         battlePhaseActive = true;
     }
+    
+    
 }
