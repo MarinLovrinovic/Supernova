@@ -23,6 +23,11 @@ public class PlayerNetworkData : NetworkBehaviour
 
         ApplyColor();
         Debug.Log("[PlayerNetworkData.Spawned] Player spawned with color index: " + ColorIndex);
+
+        if (Object.HasInputAuthority)
+        {
+            Runner.SetPlayerObject(Object.InputAuthority, Object);
+        }
     }
 
 

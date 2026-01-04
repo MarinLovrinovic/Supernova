@@ -1,6 +1,7 @@
 using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 using Fusion.Addons.Physics;
 
 
@@ -12,13 +13,43 @@ public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
     public static WaitingRoomManager Instance;
     public PlayerNetworkData LocalPlayer { get; private set; }
 
-    private readonly List<NetworkBehaviourId> players = new();
+    [Networked, Capacity(10), OnChangedRender(nameof(OnPlayersChanged))]
+    public NetworkLinkedList<NetworkBehaviourId> Players => default;
 
+    public void OnPlayersChanged()
+    {
+        WaitingRoomUIManager.Instance.UpdatePlayersJoined(Players.Count, MaxPlayers);
+        WaitingRoomUIManager.Instance.UpdatePlayersReady(ReadyCount, Players.Count);
+    }
 
     [Networked, OnChangedRender(nameof(OnTimeChanged))]
     public int TimeRemaining { get; private set; }
     private float _timerAcc = 0f;
-    private int readyCount = 0;
+    private int ReadyCount => ReadyPlayers.Count(kvp => kvp.Value);
+    
+    [Networked, Capacity(10), OnChangedRender(nameof(OnReadyChanged))]
+    public NetworkDictionary<PlayerRef, bool> ReadyPlayers => default;
+    public void OnReadyChanged()
+    {
+        Debug.Log("Ready changed!");
+        WaitingRoomUIManager.Instance.UpdatePlayersReady(ReadyCount, Players.Count);
+    }
+    
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    private void RPC_ToggleReady(PlayerRef player)
+    {
+        bool isReady = false;
+
+        if (ReadyPlayers.TryGet(player, out var current))
+            isReady = current;
+
+        ReadyPlayers.Set(player, !isReady);
+        
+        if (ReadyCount == Players.Count)
+        {
+            StartBattleScene();
+        }
+    }
     private const int MaxPlayers = 6;
 
 
@@ -50,7 +81,7 @@ public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
                 LocalPlayer = playerData;
             }
 
-            players.Add(playerData.Id);
+            AddPlayer(playerData.Id);
         }
 
 
@@ -110,48 +141,20 @@ public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
         if (LocalPlayer == null)
             return;
 
-        LocalPlayer.SetReady(!LocalPlayer.IsReady);
-
-        if (LocalPlayer.IsReady)
-        {
-            readyCount++;
-
-            // bez postavljenog InterpolationTarget na NetworkRigidbody2D dode do errora kad se prijede u Battle Scene
-            // ali klijenti se na svojim ekranima ne pomicu pravilno kad je postavljen
-            // nasilno rjesenje: kad klijent klikne ready ukljuci mu se i onda se opet iskljuci u battle
-            // ako ne nademo bolje rjesenje mozemo dodat neki loading screen za ovo
-            // HOST ZADNJI MORA READYAT (privremeno)
-            foreach (var player in Runner.ActivePlayers)
-            {
-                if (!Runner.TryGetPlayerObject(player, out var playerObject))
-                    continue;
-
-                var nrb = playerObject.GetComponent<NetworkRigidbody2D>();
-                nrb.InterpolationTarget = nrb.GetComponentInChildren<InterpolationTarget>().Target;
-            }
-
-            StartBattleScene();
-        }
-        else
-        {
-            readyCount--;
-        }
-
-        WaitingRoomUIManager.Instance.UpdatePlayersReady(readyCount, players.Count);
-
-
+        RPC_ToggleReady(Runner.LocalPlayer);
     }
     public void AddPlayer(NetworkBehaviourId playerNetworkDataId)
     {
         Debug.Log("player joined " + playerNetworkDataId);
-        players.Add(playerNetworkDataId); // manager ima uvid na sve igrace koji udu 
 
+        if (!Object.HasStateAuthority)
+            return;
 
-        WaitingRoomUIManager.Instance.UpdatePlayersJoined(players.Count, MaxPlayers);
-        WaitingRoomUIManager.Instance.UpdatePlayersReady(readyCount, players.Count);
+        if (!Players.Contains(playerNetworkDataId))
+        {
+            Players.Add(playerNetworkDataId);
+        }
     }
-
-
 
     // pomocna funkcija za assign boje pri ulasku
     public int GetFirstFreeColor()
@@ -181,8 +184,8 @@ public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
         var roomCode = Runner.SessionInfo.Name;
         WaitingRoomUIManager.Instance.SetRoomCode(roomCode);
         WaitingRoomUIManager.Instance.UpdateTimer(TimeRemaining);
-        WaitingRoomUIManager.Instance.UpdatePlayersJoined(players.Count, MaxPlayers);
-        WaitingRoomUIManager.Instance.UpdatePlayersReady(readyCount, players.Count);
+        WaitingRoomUIManager.Instance.UpdatePlayersJoined(Players.Count, MaxPlayers);
+        WaitingRoomUIManager.Instance.UpdatePlayersReady(ReadyCount, Players.Count);
 
         if (Customization.Instance != null)
             Customization.Instance.RefreshUI();
