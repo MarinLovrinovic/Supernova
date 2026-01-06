@@ -107,3 +107,5 @@ InitTestScene*.unity*
 Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset.meta
 Library/PackageCache/com.exitgames.photon-fusion*
 Library/PackageCache/com.exitgames.photon.realtime*
+
+Assets/Photon/

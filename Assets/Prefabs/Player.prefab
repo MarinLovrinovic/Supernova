@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 2764348386662603928}
   - component: {fileID: 5542897867337555732}
   - component: {fileID: -6900792622281171183}
+  - component: {fileID: 1349615342471104979}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -208,7 +209,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd326ffcc91640a5b4e0fd3dd33d948c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectilePrefab: {fileID: 8738679601424813415, guid: 67ef455291cf8f54ea4a3a2230944b8f, type: 3}
+  projectilePrefab:
+    RawGuidValue: e897154966de4854591307f10dbb113d
   firingPoint: {fileID: 8542793270593861832}
   fireRate: 1
   fireTimer: 1
@@ -228,7 +230,9 @@ MonoBehaviour:
   respawnHealthPoints: 20
   numberOfLives: 1
   isAlive: 1
+  explosionPrefab: {fileID: 0}
   onLivesGone: 0
+  LevelToLoad: 
 --- !u!114 &-6900792622281171183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,6 +246,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bumpFactor: 0.5
+--- !u!114 &1349615342471104979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1029672585926967827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 3123993087
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 7251808516213914961}
+  - {fileID: 2764348386662603928}
+  - {fileID: 5542897867337555732}
+  ForceRemoteRenderTimeframe: 0
 --- !u!1 &4343121700145042240
 GameObject:
   m_ObjectHideFlags: 0

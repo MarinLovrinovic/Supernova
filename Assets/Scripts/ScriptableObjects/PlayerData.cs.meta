@@ -3,7 +3,10 @@ guid: a287003386cd4a9479704abfab4ef5a5
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - playerPrefab: {fileID: 1029672585926967827, guid: ef0935d093b5f4f49b4e0ac4abda0986, type: 3}
+  - weaponPrefab: {fileID: 8738679601424813415, guid: 67ef455291cf8f54ea4a3a2230944b8f, type: 3}
+  - shieldPrefab: {fileID: 2487028466535403064, guid: 512160e2458130f4fbf2db9aa63177c3, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

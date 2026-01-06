@@ -1,16 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 
-public class AsteroidSpawner : MonoBehaviour
+public class AsteroidSpawner : NetworkBehaviour
 {
     public static AsteroidSpawner Instance { get; private set; }
 
     public int number;
     public int depth;
-    public GameObject asteroidPrefab;
+    public NetworkPrefabRef asteroidPrefab;
 
-    private List<GameObject> rootAsteroids;
+    private List<NetworkObject> rootAsteroids;
     private GameObject asteroidContainer;
 
     private void Awake()
@@ -24,7 +25,7 @@ public class AsteroidSpawner : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
 
-        rootAsteroids = new List<GameObject>();
+        rootAsteroids = new List<NetworkObject>();
         asteroidContainer = new GameObject("AsteroidContainer");
     }
 
@@ -38,8 +39,11 @@ public class AsteroidSpawner : MonoBehaviour
         
     }
 
-    public void SpawnAsteroids()
+    public void SpawnAsteroids(NetworkRunner runner)
     {
+        if (!runner.IsServer)
+            return;
+        
         Camera camera = Camera.main;
 
         for (int i = 0; i < number; i++)
@@ -48,7 +52,7 @@ public class AsteroidSpawner : MonoBehaviour
             Vector3 worldPosition = camera.ViewportToWorldPoint(viewportPosition);
             worldPosition.z = 0.0f;
 
-            GameObject rootAsteroid = CreateAsteroidTree(worldPosition);
+            NetworkObject rootAsteroid = CreateAsteroidTree(runner, worldPosition);
             rootAsteroid.transform.SetParent(asteroidContainer.transform, worldPositionStays: true);
             rootAsteroids.Add(rootAsteroid);
         }
@@ -70,9 +74,9 @@ public class AsteroidSpawner : MonoBehaviour
         rootAsteroids.Clear();
     }
 
-    GameObject CreateAsteroidTree(Vector3 worldPos)
+    NetworkObject CreateAsteroidTree(NetworkRunner runner, Vector3 worldPos)
     {
-        GameObject root = Instantiate(asteroidPrefab, worldPos, Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)));
+        NetworkObject root = runner.Spawn(asteroidPrefab, worldPos, Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)));
 
         if (root.GetComponent<TreeNode>() == null) return root;
         if (depth <= 0) return root;
