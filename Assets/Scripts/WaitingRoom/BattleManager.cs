@@ -66,6 +66,7 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
             OnPlayerSpawned(obj, player);
         }
 
+        AsteroidSpawner.Instance.SpawnAsteroids(Runner);
     }
 
     public void OnPlayerSpawned(NetworkObject networkPlayerObject, PlayerRef player)

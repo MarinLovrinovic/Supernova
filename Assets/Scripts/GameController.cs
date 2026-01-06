@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
 public class GameController : MonoBehaviour
 {
@@ -44,7 +45,6 @@ public class GameController : MonoBehaviour
 
         battlePhaseActive = false;
         SpawnPlayers();
-        AsteroidSpawner.Instance.SpawnAsteroids();
         battlePhaseActive = true;
     }
 
@@ -121,10 +121,10 @@ public class GameController : MonoBehaviour
         AsteroidSpawner.Instance.DespawnAsteroids();
     }
 
-    private void ShopEnd()
+    private void ShopEnd(NetworkRunner runner)
     {
         SpawnPlayers();
-        AsteroidSpawner.Instance.SpawnAsteroids();
+        AsteroidSpawner.Instance.SpawnAsteroids(runner);
         battlePhaseActive = true;
     }
     
