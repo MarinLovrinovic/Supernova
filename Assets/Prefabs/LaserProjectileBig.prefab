@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 7726324570022942620}
   - component: {fileID: -891813655353882556}
   m_Layer: 0
-  m_Name: Projectile
+  m_Name: LaserProjectileBig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -79,8 +79,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 0.9811321, g: 0.0786757, b: 0.0786757, a: 1}
+  m_Sprite: {fileID: 21300000, guid: fa24002731b08bf48ad4777999c60fbf, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -166,8 +166,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 10
   lifeTime: 1
-  respawns: []
-  damageAmount: 10
+  damageAmount: 15
+  isExplosive: 0
+  explosionPrefab:
+    RawGuidValue: 00000000000000000000000000000000
+  explosionRadius: 1
+  explosionDamage: 1
 --- !u!114 &1211687042217053180
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,7 +219,7 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 388983748
+  SortKey: 3046603067
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []

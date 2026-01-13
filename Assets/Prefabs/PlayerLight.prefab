@@ -14,12 +14,11 @@ GameObject:
   - component: {fileID: 7868025840883224769}
   - component: {fileID: 7251808516213914961}
   - component: {fileID: 1689108609576032035}
-  - component: {fileID: 2764348386662603928}
   - component: {fileID: 5542897867337555732}
   - component: {fileID: -6900792622281171183}
   - component: {fileID: 1349615342471104979}
   m_Layer: 0
-  m_Name: Player
+  m_Name: PlayerLight
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35,8 +34,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.6, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8743157527054111540}
   m_Father: {fileID: 0}
@@ -82,7 +81,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  m_Sprite: {fileID: 21300000, guid: dc4793e270d447b47aaeac5a0676bd03, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -155,8 +154,8 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.28866667}
-    oldSize: {x: 1, y: 1}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.32, y: 0.32}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -164,9 +163,9 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: 0, y: 0.5773587}
-      - {x: -0.5, y: -0.28866667}
-      - {x: 0.5, y: -0.28866667}
+    - - {x: 0.000089670066, y: 0.13170174}
+      - {x: -0.11878918, y: -0.03130354}
+      - {x: 0.113417625, y: -0.032996967}
   m_UseDelaunayMesh: 0
 --- !u!114 &7251808516213914961
 MonoBehaviour:
@@ -180,10 +179,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 610bb5c267b901f45b4be386cda21bd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thrustForceAcceleration: 4
-  thrustForceDeacceleration: 1
+  thrustForceAcceleration: 5
+  thrustForceDeacceleration: 5
   rotationSpeed: 180
-  maxVelocity: 7
+  maxVelocity: 10
   jetSprite: {fileID: 428346967132847393}
 --- !u!114 &1689108609576032035
 MonoBehaviour:
@@ -197,23 +196,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca88faf8d11da2e46ba03b39bf567dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &2764348386662603928
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1029672585926967827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd326ffcc91640a5b4e0fd3dd33d948c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  projectilePrefab:
-    RawGuidValue: e897154966de4854591307f10dbb113d
-  firingPoint: {fileID: 8542793270593861832}
-  fireRate: 1
-  fireTimer: 1
 --- !u!114 &5542897867337555732
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,9 +212,7 @@ MonoBehaviour:
   respawnHealthPoints: 20
   numberOfLives: 1
   isAlive: 1
-  explosionPrefab: {fileID: 0}
   onLivesGone: 0
-  LevelToLoad: 
 --- !u!114 &-6900792622281171183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,13 +238,12 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 3123993087
+  SortKey: 616477398
   ObjectInterest: 1
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 7251808516213914961}
-  - {fileID: 2764348386662603928}
   - {fileID: 5542897867337555732}
   ForceRemoteRenderTimeframe: 0
 --- !u!1 &4343121700145042240
@@ -292,13 +271,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4343121700145042240}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0.5, w: 0.8660254}
-  m_LocalPosition: {x: 0, y: -0.4, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
+  m_LocalPosition: {x: 0, y: -0.065, z: 0}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 8542793270593861832}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 60}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
 --- !u!212 &428346967132847393
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -340,7 +319,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  m_Sprite: {fileID: 665676192, guid: 41a71fd183eab5f488549df4b632f0f2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
