@@ -81,7 +81,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_Sprite: {fileID: 21300000, guid: fe91df202ee6e404799227e076d45787, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -230,9 +230,7 @@ MonoBehaviour:
   respawnHealthPoints: 20
   numberOfLives: 1
   isAlive: 1
-  explosionPrefab: {fileID: 0}
   onLivesGone: 0
-  LevelToLoad: 
 --- !u!114 &-6900792622281171183
 MonoBehaviour:
   m_ObjectHideFlags: 0

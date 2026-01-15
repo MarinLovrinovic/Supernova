@@ -459,7 +459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 800, y: 600}
@@ -506,7 +506,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2113478995}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2122303078}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2598,6 +2598,10 @@ PrefabInstance:
       value: WaitingRoomManager
       objectReference: {fileID: 0}
     - target: {fileID: 4656492935350815497, guid: 489c8c12539c8ed4187240fffea45bf5, type: 3}
+      propertyPath: DisableBeforeBattleScene
+      value: 
+      objectReference: {fileID: 2122303077}
+    - target: {fileID: 4656492935350815497, guid: 489c8c12539c8ed4187240fffea45bf5, type: 3}
       propertyPath: _waitingRoomManagerPrefab.RawGuidValue.Array.data[0]
       value: -3130392810368492472
       objectReference: {fileID: 0}
@@ -3320,7 +3324,7 @@ RectTransform:
   - {fileID: 1935458895}
   - {fileID: 335612965}
   - {fileID: 205403196}
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2122303078}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -3716,7 +3720,7 @@ RectTransform:
   m_GameObject: {fileID: 2113478994}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -0.0011783}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.2, y: 0.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1390544362}
@@ -3731,9 +3735,42 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -785, y: -369}
+  m_AnchoredPosition: {x: -289.8, y: -146.37}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &2122303077
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2122303078}
+  m_Layer: 0
+  m_Name: WaitingRoomObjects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2122303078
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2122303077}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1942783487}
+  - {fileID: 294491894}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &2144132970 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8268646256831199243, guid: 72351a63a70b05744a4a95396e902ce8, type: 3}
@@ -3757,7 +3794,6 @@ SceneRoots:
   - {fileID: 1373009178}
   - {fileID: 932833039}
   - {fileID: 36171084}
-  - {fileID: 1942783487}
-  - {fileID: 294491894}
   - {fileID: 1724255369}
   - {fileID: 1590522707}
+  - {fileID: 2122303078}

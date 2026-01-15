@@ -171,7 +171,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &591758893
 AudioListener:
   m_ObjectHideFlags: 0
@@ -297,6 +297,10 @@ PrefabInstance:
     - target: {fileID: 8954905892780604692, guid: 2c94adf7168cd2942b17c3ff875b898d, type: 3}
       propertyPath: m_Name
       value: PlayerSpawner
+      objectReference: {fileID: 0}
+    - target: {fileID: 8954905892780604692, guid: 2c94adf7168cd2942b17c3ff875b898d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -541,6 +545,10 @@ PrefabInstance:
     - target: {fileID: 6362939901852570886, guid: 73ea219709b5af64dadbd09ab0e5c6d7, type: 3}
       propertyPath: m_Name
       value: GameController
+      objectReference: {fileID: 0}
+    - target: {fileID: 6362939901852570886, guid: 73ea219709b5af64dadbd09ab0e5c6d7, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7574159998645766875, guid: 73ea219709b5af64dadbd09ab0e5c6d7, type: 3}
       propertyPath: playerNumber

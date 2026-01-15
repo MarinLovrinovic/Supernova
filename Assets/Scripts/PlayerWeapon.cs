@@ -13,10 +13,10 @@ namespace DefaultNamespace
         [Networked] private NetworkButtons _buttonsPrevious { get; set; }
         [Networked] private TickTimer _shootCooldown { get; set; }
 
-        private Rigidbody2D rbWeapon;
+        private Transform rbWeapon;
         public override void Spawned()
         {
-            rbWeapon = GetComponent<Rigidbody2D>();
+            rbWeapon = GetComponent<Transform>();
         }
 
         public override void FixedUpdateNetwork()

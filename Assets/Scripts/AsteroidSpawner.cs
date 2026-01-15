@@ -12,7 +12,6 @@ public class AsteroidSpawner : NetworkBehaviour
     public NetworkPrefabRef asteroidPrefab;
 
     private List<NetworkObject> rootAsteroids;
-    private GameObject asteroidContainer;
 
     private void Awake()
     {
@@ -26,49 +25,43 @@ public class AsteroidSpawner : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
 
         rootAsteroids = new List<NetworkObject>();
-        asteroidContainer = new GameObject("AsteroidContainer");
-    }
-
-    void Start()
-    {
-        
-    }
-
-    void Update()
-    {
-        
     }
 
     public void SpawnAsteroids(NetworkRunner runner)
     {
         if (!runner.IsServer)
             return;
-        
+
         Camera camera = Camera.main;
 
         for (int i = 0; i < number; i++)
         {
-            Vector3 viewportPosition = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), camera.nearClipPlane + 10f);
+            Vector3 viewportPosition = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), 10f);
             Vector3 worldPosition = camera.ViewportToWorldPoint(viewportPosition);
             worldPosition.z = 0.0f;
 
             NetworkObject rootAsteroid = CreateAsteroidTree(runner, worldPosition);
-            rootAsteroid.transform.SetParent(asteroidContainer.transform, worldPositionStays: true);
+
             rootAsteroids.Add(rootAsteroid);
         }
     }
 
     public void DespawnAsteroids()
     {
-        if (rootAsteroids.Count == 0)
+        if (Object == null || !Object.HasStateAuthority) return;
+
+        if (rootAsteroids == null || rootAsteroids.Count == 0)
         {
-            Debug.Log("There are no root asteroids!");
+            Debug.Log("There are no root asteroids to despawn!");
             return;
         }
 
-        for (int i = 0; i < rootAsteroids.Count; i++)
+        foreach (var asteroid in rootAsteroids)
         {
-            Destroy(rootAsteroids[i]);
+            if (asteroid != null && asteroid.IsValid)
+            {
+                Runner.Despawn(asteroid);
+            }
         }
 
         rootAsteroids.Clear();
@@ -78,10 +71,11 @@ public class AsteroidSpawner : NetworkBehaviour
     {
         NetworkObject root = runner.Spawn(asteroidPrefab, worldPos, Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)));
 
-        if (root.GetComponent<TreeNode>() == null) return root;
-        if (depth <= 0) return root;
-
-        root.GetComponent<TreeNode>().SpawnChildren(depth, root, asteroidPrefab);
+        var treeNode = root.GetComponent<TreeNode>();
+        if (treeNode != null && depth > 0)
+        {
+            treeNode.SpawnChildren(depth, root, asteroidPrefab);
+        }
 
         return root;
     }

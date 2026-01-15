@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8354827394242066788}
   - component: {fileID: 3871747635301735044}
   - component: {fileID: -6133915488828185053}
+  - component: {fileID: -2574747208359563900}
   m_Layer: 0
   m_Name: ShieldOS
   m_TagString: Untagged
@@ -212,3 +213,22 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.32, y: 0.12929727}
   m_EdgeRadius: 0
+--- !u!114 &-2574747208359563900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2487028466535403064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SortKey: 2686477060
+  ObjectInterest: 1
+  Flags: 262145
+  NestedObjects: []
+  NetworkedBehaviours:
+  - {fileID: 3871747635301735044}
+  ForceRemoteRenderTimeframe: 0
