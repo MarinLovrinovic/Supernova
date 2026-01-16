@@ -1,5 +1,6 @@
 public enum BodyType
 {
-    None,
-    Standard
+    Basic,
+    Heavy,
+    Light
 }

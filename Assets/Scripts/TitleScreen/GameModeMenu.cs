@@ -30,6 +30,13 @@ public class GameModeMenu : MonoBehaviour
         {
             code = GenerateRoomCode();
         }
+        else if (code.Length != 4)
+        {
+            Debug.Log("Invalid room code. It must be 4 characters long.");
+            // popup 
+            // return;
+        }
+
 
 
         _runner = FindObjectOfType<NetworkRunner>();
@@ -50,12 +57,19 @@ public class GameModeMenu : MonoBehaviour
         //
 
 
-        await _runner.StartGame(new StartGameArgs
+        var result = await _runner.StartGame(new StartGameArgs
         {
             GameMode = mode,
-            SessionName = code,
+            SessionName = code.ToUpper(),
             //Scene = scene,
         });
+
+        if (!result.Ok)
+            {
+                Debug.Log("Failed to join session: " + result.ShutdownReason);
+                // popup 
+                return;
+            }
 
         if (_runner.IsServer)
         {

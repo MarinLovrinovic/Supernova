@@ -1,17 +1,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 
-public class Customization : MonoBehaviour
+public class Customization : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public static Customization Instance;
     public List<Button> colorButtons;
+    private bool hovering = false;
 
 
     private void Awake()
     {
         Instance = this;
+    }
+    private void Update()
+    {
+        if (!hovering && Input.GetMouseButtonDown(0))
+        {
+            transform.Find("ColorButtons")
+                    ?.gameObject.SetActive(false);
+        }
     }
 
     private void Start()
@@ -85,6 +95,17 @@ public class Customization : MonoBehaviour
             colorButtons[i].interactable = !taken || mine;
         }
     }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        hovering = true;
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        hovering = false;
+    }
+
 
 }
 

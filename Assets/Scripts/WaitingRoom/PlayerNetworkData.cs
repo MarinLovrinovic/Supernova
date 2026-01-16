@@ -9,7 +9,12 @@ public class PlayerNetworkData : NetworkBehaviour
     [SerializeField] public List<Color> palette;
     [Networked, OnChangedRender(nameof(OnColorChanged))]
     public int ColorIndex { get; set; }
+    [SerializeField] public List<Sprite> bodySprite;
+    [Networked, OnChangedRender(nameof(OnBodyChanged))]
+    public BodyType BodyType { get; set; }
+    
     [Networked] public bool IsReady { get; set; }
+
 
     public override void Spawned()
     {
@@ -57,7 +62,6 @@ public class PlayerNetworkData : NetworkBehaviour
         var renderer = GetComponentInChildren<SpriteRenderer>();
         renderer.color = palette[ColorIndex];
 
-
         // svima se updejtaju dostupne boje odma
         if (Object.HasInputAuthority && Customization.Instance != null)
         {
@@ -70,4 +74,25 @@ public class PlayerNetworkData : NetworkBehaviour
             IsReady = ready;
     }
 
+
+
+    // trebalo bi u upgrade shopu kada se treba promijenit tijelo napravit
+    // slicno ka u customization kada se odabere boja da se posalje rpc request hostu 
+    // i da host onda u biti promijeni vrijednost BodyType odredenog igraca
+    // i onda se igracu ovdi promijeni tijelo iz spriteova koji su spremljeni na svakom igracu
+    void OnBodyChanged()
+    {
+        if (BodyType == BodyType.Basic)
+        {
+            GetComponentInChildren<SpriteRenderer>().sprite = bodySprite[0];
+        }
+        else if (BodyType == BodyType.Heavy)
+        {
+            GetComponentInChildren<SpriteRenderer>().sprite = bodySprite[1];
+        }
+        else if (BodyType == BodyType.Light)
+        {
+            GetComponentInChildren<SpriteRenderer>().sprite = bodySprite[2];
+        }
+    }
 }

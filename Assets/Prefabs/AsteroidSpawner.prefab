@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7591970075024434223}
   - component: {fileID: 1298297092594865109}
   m_Layer: 0
-  m_Name: Spawner
+  m_Name: AsteroidSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   number: 10
-  depth: 4
+  depth: 0
   asteroidPrefab:
     RawGuidValue: 489a4a337b24ea546913cb59abc67bc2
 --- !u!114 &1298297092594865109

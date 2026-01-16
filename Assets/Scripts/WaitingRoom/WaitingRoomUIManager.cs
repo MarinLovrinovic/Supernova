@@ -55,6 +55,10 @@ public class WaitingRoomUIManager : MonoBehaviour
     public void UpdateTimer(int timeRemaining)
     {
         timerText.text = Mathf.CeilToInt(timeRemaining).ToString();
+        if (timeRemaining <= 10)
+        {
+            timerText.color = Color.red;
+        }
     }
 
     public void UpdatePlayersJoined(int totalCount, int maxCount)

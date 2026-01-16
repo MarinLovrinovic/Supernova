@@ -72,6 +72,10 @@ public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
                 TimeRemaining--;
             }
         }
+        if (TimeRemaining == 0)
+        {
+            StartBattleScene();
+        }
     }
     public void SetLocalPlayer(PlayerNetworkData player)
     {
@@ -85,19 +89,26 @@ public class WaitingRoomManager : NetworkBehaviour, IPlayerSpawnerHandler
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     private void RPC_ToggleReady(PlayerRef player)
     {
+        if (ReadyCount == Players.Count)
+            return;
+            
         bool isReady = false;
         if (ReadyPlayers.TryGet(player, out var current)) isReady = current;
 
         ReadyPlayers.Set(player, !isReady);
 
-        if (ReadyCount == Players.Count && Players.Count > 0)
+        if (ReadyCount == Players.Count && Players.Count > 0 && TimeRemaining > 11)
         {
-            StartBattleScene();
+            TimeRemaining = 10;
+            //StartBattleScene();
         }
     }
 
     public void StartBattleScene()
     {
+        if (GameStarted)
+            return; 
+
         if (Object.HasStateAuthority)
         {
             GameStarted = true;
