@@ -1,5 +1,6 @@
 using UnityEngine;
 using Fusion;
+using UnityEngine.SceneManagement;
 
 public class Health : NetworkBehaviour
 {
@@ -17,6 +18,8 @@ public class Health : NetworkBehaviour
     private Rigidbody2D _rb;
     private Collider2D _col;
     private Renderer[] _renderers;
+    
+    private bool _openedLocalShop = false;
 
     public override void Spawned()
     {
@@ -66,11 +69,30 @@ public class Health : NetworkBehaviour
     public void OnAliveChanged()
     {
         UpdateVisuals(IsAlive);
+        
+        if (!IsAlive && Object.HasInputAuthority && !_openedLocalShop)
+        {
+            _openedLocalShop = true;
+
+            if (Runner != null)
+            {
+                Runner.ProvideInput = false;
+            }
+            
+            SceneManager.LoadSceneAsync("UpgradeShop", LoadSceneMode.Additive);
+        }
 
         if (!IsAlive && onLivesGone == DeathAction.DestroyedWhenDead)
         {
-
         }
+    }
+    
+    public void ResumeAfterShopLocal()
+    {
+        if (Runner != null)
+            Runner.ProvideInput = true;
+
+        _openedLocalShop = false;
     }
 
     private void UpdateVisuals(bool state)

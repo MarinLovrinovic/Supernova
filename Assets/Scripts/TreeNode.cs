@@ -46,6 +46,12 @@ public class TreeNode : NetworkBehaviour
         NetworkObject leftObj = SpawnChild(out leftChild, parentObj, parentPrefab);
         NetworkObject rightObj = SpawnChild(out rightChild, parentObj, parentPrefab);
 
+        if (AsteroidSpawner.Instance != null) 
+        {
+            AsteroidSpawner.Instance.RegisterAsteroid(leftObj);  
+            AsteroidSpawner.Instance.RegisterAsteroid(rightObj); 
+        }
+        
         depth--;
 
         if (depth > 0)

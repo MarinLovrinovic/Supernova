@@ -15,6 +15,7 @@ public class PlayerNetworkData : NetworkBehaviour
     
     [Networked] public bool IsReady { get; set; }
 
+    public static PlayerNetworkData Local;
 
     public override void Spawned()
     {
@@ -32,6 +33,7 @@ public class PlayerNetworkData : NetworkBehaviour
         if (Object.HasInputAuthority)
         {
             Runner.SetPlayerObject(Object.InputAuthority, Object);
+            Local = this;
         }
     }
 
@@ -47,6 +49,13 @@ public class PlayerNetworkData : NetworkBehaviour
     public void RPC_RefreshCustomizationUI()
     {
         Customization.Instance.RefreshUI();
+    }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_ClickedAccept()
+    {
+        if (BattleManager.Instance != null)
+            BattleManager.Instance.ServerRegisterAccept(Object.InputAuthority); 
     }
 
     void OnColorChanged()

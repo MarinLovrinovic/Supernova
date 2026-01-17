@@ -13,6 +13,8 @@ public class AsteroidSpawner : NetworkBehaviour
 
     private List<NetworkObject> rootAsteroids;
 
+    private HashSet<NetworkObject> allAsteroids = new HashSet<NetworkObject>();
+    
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -26,6 +28,13 @@ public class AsteroidSpawner : NetworkBehaviour
 
         rootAsteroids = new List<NetworkObject>();
     }
+    
+    public void RegisterAsteroid(NetworkObject obj)
+    {
+        if (obj == null) return;
+        allAsteroids.Add(obj);
+    }
+
 
     public void SpawnAsteroids(NetworkRunner runner)
     {
@@ -46,31 +55,73 @@ public class AsteroidSpawner : NetworkBehaviour
         }
     }
 
-    public void DespawnAsteroids()
-    {
-        if (Object == null || !Object.HasStateAuthority) return;
+    
+    //stari Despawn
+    // public void DespawnAsteroids()
+    // {
+    //     if (Object == null || !Object.HasStateAuthority) return;
+    //     
+    //     if (allAsteroids == null || allAsteroids.Count == 0) 
+    //     {
+    //         Debug.Log("There are no asteroids to despawn!"); 
+    //         return;
+    //     }
+    //     
+    //     foreach (var asteroid in allAsteroids) 
+    //     {
+    //         if (asteroid != null && asteroid.IsValid)
+    //         {
+    //             Runner.Despawn(asteroid);
+    //         }
+    //     }
+    //     
+    //     // if (rootAsteroids == null || rootAsteroids.Count == 0)
+    //     // {
+    //     //     Debug.Log("There are no root asteroids to despawn!");
+    //     //     return;
+    //     // }
+    //
+    //     // foreach (var asteroid in rootAsteroids)
+    //     // {
+    //     //     if (asteroid != null && asteroid.IsValid)
+    //     //     {
+    //     //         Runner.Despawn(asteroid);
+    //     //     }
+    //     // }
+    //     
+    //     allAsteroids.Clear();  
+    //     rootAsteroids.Clear();
+    // }
 
-        if (rootAsteroids == null || rootAsteroids.Count == 0)
+    public void DespawnAsteroids(NetworkRunner runner)
+    {
+        if (runner == null || !runner.IsServer) return; 
+
+        if (allAsteroids == null || allAsteroids.Count == 0)
         {
-            Debug.Log("There are no root asteroids to despawn!");
+            Debug.Log("There are no asteroids to despawn!");
             return;
         }
 
-        foreach (var asteroid in rootAsteroids)
+        foreach (var asteroid in allAsteroids)
         {
             if (asteroid != null && asteroid.IsValid)
             {
-                Runner.Despawn(asteroid);
+                runner.Despawn(asteroid); 
             }
         }
 
+        allAsteroids.Clear();
         rootAsteroids.Clear();
+        
     }
 
     NetworkObject CreateAsteroidTree(NetworkRunner runner, Vector3 worldPos)
     {
         NetworkObject root = runner.Spawn(asteroidPrefab, worldPos, Quaternion.Euler(0.0f, 0.0f, Random.Range(0.0f, 360.0f)));
 
+        RegisterAsteroid(root);
+        
         var treeNode = root.GetComponent<TreeNode>();
         if (treeNode != null && depth > 0)
         {
