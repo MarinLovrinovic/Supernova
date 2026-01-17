@@ -12,15 +12,22 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
 
     [Header("Settings")]
     [SerializeField] private string upgradeShopSceneName = "UpgradeShop";
-    // [SerializeField] private string afterShopScene = "WaitingRoom";
-    // [SerializeField] private string winnerSceneName = "WinnerScene";
     [SerializeField] private int nextRoundCountdownSeconds = 10;
+    
     [SerializeField] public NetworkPrefabRef defaultWeaponPrefab;
-
+    [SerializeField] private NetworkPrefabRef raygunPrefab;          
+    [SerializeField] private NetworkPrefabRef bigRaygunPrefab;       
+    [SerializeField] private NetworkPrefabRef rocketPrefab;          
+    [SerializeField] private NetworkPrefabRef bigRocketPrefab; 
+    [SerializeField] private NetworkPrefabRef smallShieldPrefab;          
+    [SerializeField] private NetworkPrefabRef bigShieldPrefab;
+    
+    
     private bool _battleEnded = false;
     private bool _winnerPopupOpened = false;
     
     [Networked] public NetworkDictionary<PlayerRef, NetworkBool> AcceptedPlayers => default;
+    [Networked] public NetworkDictionary<PlayerRef, Upgrades> PlayerUpgrades => default;
     [Networked] public int AcceptedCount { get; set; }
     [Networked] public int AcceptRequired { get; set; }
     [Networked] public TickTimer NextRoundTimer { get; set; }
@@ -205,6 +212,11 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
                     health.IsAlive = true;
                     health.HealthPoints = health.maxHealth;
                 }
+                
+                if (PlayerUpgrades.ContainsKey(playerRef)) 
+                {
+                    ApplyUpgradeToPlayer(playerObj, PlayerUpgrades[playerRef]); 
+                }
             }
         }
         
@@ -214,30 +226,89 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         
     }
     
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_StartNewRoundClient()
-    {
-        if (Runner == null) return;
-
-        Runner.ProvideInput = true;
-        
-        var shopScene = SceneManager.GetSceneByName(upgradeShopSceneName); 
-        if (shopScene.IsValid() && shopScene.isLoaded) 
-            SceneManager.UnloadSceneAsync(upgradeShopSceneName);
-        
-    }
     
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_OpenWinnerPopup(PlayerRef winnerRef) 
+    private void ApplyUpgradeToPlayer(NetworkObject playerObj, Upgrades upgrade)
     {
-        if (Runner == null) return;
-        if (Runner.LocalPlayer != winnerRef) return;
+        var player = playerObj.GetComponent<PlayerNetworkData>();
+        var health = playerObj.GetComponent<Health>();
+        var weapon = playerObj.GetComponentInChildren<PlayerWeapon>();
 
-        Runner.ProvideInput = false;
-        SceneManager.LoadSceneAsync(upgradeShopSceneName, LoadSceneMode.Additive);
+        if (player == null) return;
+
+        switch (upgrade)
+        {
+            case Upgrades.Shield:
+                if (player.Shield == ShieldType.None)
+                    player.Shield = ShieldType.Small;
+                else if (player.Shield == ShieldType.Small)
+                    player.Shield = ShieldType.Large;
+                break;
+            
+            case Upgrades.Rockets:
+                ReplaceWeapon(playerObj, WeaponType.RocketLauncher);
+                break;
+            
+            case Upgrades.Spaceship:
+            {
+                BodyType newType;
+                do
+                {
+                    newType = (BodyType)Random.Range(0, 3);
+                }
+                while (newType == player.BodyType); 
+
+                player.BodyType = newType;
+                break;
+            }
+            
+            case Upgrades.Sword:
+                if (weapon == null) break;
+
+                if (weapon.CurrentWeapon == WeaponType.Raygun)
+                    ReplaceWeapon(playerObj, WeaponType.BigRaygun);
+                else if (weapon.CurrentWeapon == WeaponType.RocketLauncher)
+                    ReplaceWeapon(playerObj, WeaponType.BigRocketLauncher);
+                break;
+            
+            
+            default:
+                Debug.Log("Upgrade not implemented: " + upgrade);
+                break;
+        }
     }
 
+
+    private void ReplaceWeapon(NetworkObject playerObj, WeaponType newType)
+    {
+        if (!Object.HasStateAuthority) return;
+
+        var oldWeapon = playerObj.GetComponentInChildren<PlayerWeapon>();
+        if (oldWeapon != null)
+            Runner.Despawn(oldWeapon.Object);
+        
+        NetworkPrefabRef prefab = newType switch
+        {
+            WeaponType.Raygun => raygunPrefab,
+            WeaponType.BigRaygun => bigRaygunPrefab,
+            WeaponType.RocketLauncher => rocketPrefab,
+            WeaponType.BigRocketLauncher => bigRocketPrefab,
+            _ => raygunPrefab
+        };
+        
+        var weaponObj = Runner.Spawn(
+            prefab,
+            playerObj.transform.position,
+            playerObj.transform.rotation,
+            playerObj.InputAuthority
+        );
+
+        weaponObj.transform.SetParent(playerObj.transform, false);
+
+        var playerWeapon = weaponObj.GetComponent<PlayerWeapon>();
+        if (playerWeapon != null)
+            playerWeapon.CurrentWeapon = newType;
+        
+    }
     
     
     public void OnPlayerSpawned(NetworkObject networkPlayerObject, PlayerRef player)
@@ -262,9 +333,40 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         }
     }
     
+    
+    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_StartNewRoundClient()
+    {
+        if (Runner == null) return;
+
+        Runner.ProvideInput = true;
+        
+        var shopScene = SceneManager.GetSceneByName(upgradeShopSceneName); 
+        if (shopScene.IsValid() && shopScene.isLoaded) 
+            SceneManager.UnloadSceneAsync(upgradeShopSceneName);
+        
+    }
+    
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_OpenWinnerPopup(PlayerRef winnerRef) 
+    {
+        if (Runner == null) return;
+        if (Runner.LocalPlayer != winnerRef) return;
+
+        Runner.ProvideInput = false;
+        SceneManager.LoadSceneAsync(upgradeShopSceneName, LoadSceneMode.Additive);
+    }
+    
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_SubmitUpgrade(PlayerRef player, Upgrades upgrade)
     {
         Debug.Log($"Upgrade submitted: {player} -> {upgrade}");
+        
+        if (PlayerUpgrades.ContainsKey(player)) 
+            PlayerUpgrades.Remove(player);      
+
+        PlayerUpgrades.Add(player, upgrade);
     }
 }

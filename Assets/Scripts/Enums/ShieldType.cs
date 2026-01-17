@@ -1,5 +1,6 @@
 public enum ShieldType
 {
     None,
-    Standard
+    Small,
+    Large
 }

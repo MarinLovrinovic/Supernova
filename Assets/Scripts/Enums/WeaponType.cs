@@ -1,5 +1,7 @@
 public enum WeaponType
 {
-    None,
-    Standard
+    Raygun,
+    BigRaygun,
+    RocketLauncher,
+    BigRocketLauncher
 }

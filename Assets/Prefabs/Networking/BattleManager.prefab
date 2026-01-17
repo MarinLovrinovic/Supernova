@@ -64,5 +64,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6920c58bd96a4e54b99db1eaee4aade2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _BattleManagerPrefab:
-    RawGuidValue: 8b691dab660c02b48af929e73f3bb351
+  upgradeShopSceneName: UpgradeShop
+  nextRoundCountdownSeconds: 10
+  defaultWeaponPrefab:
+    RawGuidValue: 96dac8d767a2d5c488e58b7128305b6c
+  raygunPrefab:
+    RawGuidValue: 96dac8d767a2d5c488e58b7128305b6c
+  bigRaygunPrefab:
+    RawGuidValue: 6299e553fb966494c988267696f93fd8
+  rocketPrefab:
+    RawGuidValue: a01a56d1016917047b0f73ae150f915e
+  bigRocketPrefab:
+    RawGuidValue: 621871862e95b504d81f42068c0f5f74
+  smallShieldPrefab:
+    RawGuidValue: c46746a6aa68309408bec32319e3c771
+  bigShieldPrefab:
+    RawGuidValue: 512160e2458130f4fbf2db9aa63177c3
+  _AcceptedPlayers:
+    _items: []
+  _PlayerUpgrades:
+    _items: []
+  _AcceptedCount: 0
+  _AcceptRequired: 0
+  _NextRoundCountdownRunning:
+    _value: 0

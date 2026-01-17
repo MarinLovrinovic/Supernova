@@ -13,6 +13,8 @@ public class PlayerNetworkData : NetworkBehaviour
     [Networked, OnChangedRender(nameof(OnBodyChanged))]
     public BodyType BodyType { get; set; }
     
+    [Networked] public ShieldType Shield { get; set; }
+    
     [Networked] public bool IsReady { get; set; }
 
     public static PlayerNetworkData Local;

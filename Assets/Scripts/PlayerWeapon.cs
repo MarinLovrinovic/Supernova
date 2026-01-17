@@ -12,6 +12,7 @@ namespace DefaultNamespace
 
         [Networked] private NetworkButtons _buttonsPrevious { get; set; }
         [Networked] private TickTimer _shootCooldown { get; set; }
+        [Networked] public WeaponType CurrentWeapon { get; set; }
 
         private Transform rbWeapon;
         public override void Spawned()
