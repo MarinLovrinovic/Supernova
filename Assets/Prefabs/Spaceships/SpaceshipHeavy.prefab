@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: 1212094670498292084}
   - component: {fileID: 608660546175625974}
   m_Layer: 0
-  m_Name: Spaceship
+  m_Name: SpaceshipHeavy
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -191,7 +191,7 @@ MonoBehaviour:
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SortKey: 300792935
+  SortKey: 3505837793
   ObjectInterest: 1
   Flags: 786433
   NestedObjects:
@@ -295,7 +295,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: 1393f873fe2b4bf4eacaeea4dbbcdcad, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a3086b66fc338f440bcd599e3f38823a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -445,7 +445,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -7120052115207748800, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
       propertyPath: SortKey
-      value: 136143770
+      value: 3341188628
       objectReference: {fileID: 0}
     - target: {fileID: 2219208642778883057, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
       propertyPath: m_Name

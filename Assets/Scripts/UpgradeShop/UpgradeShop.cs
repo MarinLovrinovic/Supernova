@@ -186,9 +186,4 @@ public class UpgradeShop : MonoBehaviour
         if (contRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(contRt);
     }
     
-    
-    
-    
-    
-    
 }

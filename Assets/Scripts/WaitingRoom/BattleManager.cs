@@ -204,6 +204,8 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         
         foreach (var playerRef in Runner.ActivePlayers)
         {
+            Debug.Log("player: " + playerRef);
+
             if (Runner.TryGetPlayerObject(playerRef, out var playerObj))
             {
                 var health = playerObj.GetComponent<Health>();
@@ -215,7 +217,8 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
                 
                 if (PlayerUpgrades.ContainsKey(playerRef)) 
                 {
-                    ApplyUpgradeToPlayer(playerObj, PlayerUpgrades[playerRef]); 
+                    ApplyUpgradeToPlayer(playerObj, PlayerUpgrades[playerRef]);
+                    PlayerUpgrades.Remove(playerRef);
                 }
             }
         }
@@ -230,7 +233,6 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
     private void ApplyUpgradeToPlayer(NetworkObject playerObj, Upgrades upgrade)
     {
         var player = playerObj.GetComponent<PlayerNetworkData>();
-        var health = playerObj.GetComponent<Health>();
         var weapon = playerObj.GetComponentInChildren<PlayerWeapon>();
 
         if (player == null) return;
@@ -239,9 +241,19 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         {
             case Upgrades.Shield:
                 if (player.Shield == ShieldType.None)
+                {
                     player.Shield = ShieldType.Small;
+                    AddShield();
+                }
                 else if (player.Shield == ShieldType.Small)
+                {
                     player.Shield = ShieldType.Large;
+                    UpgradeShield();
+                }
+                else
+                {
+                    UpgradeShield();
+                }
                 break;
             
             case Upgrades.Rockets:
@@ -277,6 +289,16 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         }
     }
 
+    private void AddShield()
+    {
+        
+    }
+
+    private void UpgradeShield()
+    {
+
+    }
+
 
     private void ReplaceWeapon(NetworkObject playerObj, WeaponType newType)
     {
@@ -307,9 +329,9 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         var playerWeapon = weaponObj.GetComponent<PlayerWeapon>();
         if (playerWeapon != null)
             playerWeapon.CurrentWeapon = newType;
-        
+
+        Debug.Log("Set new weapon: " + weaponObj);
     }
-    
     
     public void OnPlayerSpawned(NetworkObject networkPlayerObject, PlayerRef player)
     {
