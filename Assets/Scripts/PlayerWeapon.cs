@@ -8,7 +8,6 @@ namespace DefaultNamespace
         [SerializeField] private NetworkPrefabRef projectilePrefab;
         [SerializeField] private Transform firingPoint;
         [SerializeField] private float fireRate;
-        [SerializeField] private float fireTimer;
 
         [Networked] private NetworkButtons _buttonsPrevious { get; set; }
         [Networked] private TickTimer _shootCooldown { get; set; }

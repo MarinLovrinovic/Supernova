@@ -6,6 +6,9 @@ public class Health : NetworkBehaviour
 {
     public enum DeathAction { DoNothingWhenDead, DestroyedWhenDead }
 
+    [SerializeField] private LayerMask deadLayer;
+    [SerializeField] private LayerMask aliveLayer;
+
     [Networked] public float HealthPoints { get; set; }
 
     [Networked, OnChangedRender(nameof(OnAliveChanged))]
@@ -17,7 +20,6 @@ public class Health : NetworkBehaviour
 
     private Rigidbody2D _rb;
     private Collider2D _col;
-    private Renderer[] _renderers;
     
     private bool _openedLocalShop = false;
 
@@ -25,7 +27,6 @@ public class Health : NetworkBehaviour
     {
         _rb = GetComponent<Rigidbody2D>();
         _col = GetComponent<Collider2D>();
-        _renderers = GetComponentsInChildren<Renderer>();
 
         if (Object.HasStateAuthority)
         {
@@ -100,9 +101,6 @@ public class Health : NetworkBehaviour
         if (_col) _col.enabled = state;
         if (_rb) _rb.simulated = state;
 
-        foreach (var r in _renderers)
-        {
-            r.enabled = state;
-        }
+        gameObject.layer = state ? aliveLayer : deadLayer; 
     }
 }

@@ -99,10 +99,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectilePrefab:
-    RawGuidValue: e897154966de4854591307f10dbb113d
+    RawGuidValue: a01a56d1016917047b0f73ae150f915e
   firingPoint: {fileID: 8823737974821731381}
   fireRate: 1
   fireTimer: 3
+  _CurrentWeapon: 2
 --- !u!114 &-3917920244551228171
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -160,6 +160,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0b8f92b78a34f31b2ce67ca021c4886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  deadLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  aliveLayer:
+    serializedVersion: 2
+    m_Bits: 1
   _HealthPoints: 0
   _IsAlive:
     _value: 1

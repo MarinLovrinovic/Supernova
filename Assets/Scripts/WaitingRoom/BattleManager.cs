@@ -17,8 +17,8 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
     [SerializeField] public NetworkPrefabRef defaultWeaponPrefab;
     [SerializeField] private NetworkPrefabRef raygunPrefab;          
     [SerializeField] private NetworkPrefabRef bigRaygunPrefab;       
-    [SerializeField] private NetworkPrefabRef rocketPrefab;          
-    [SerializeField] private NetworkPrefabRef bigRocketPrefab; 
+    [SerializeField] private NetworkPrefabRef rocketLauncherPrefab;          
+    [SerializeField] private NetworkPrefabRef bigRocketLauncherPrefab; 
     [SerializeField] private NetworkPrefabRef smallShieldPrefab;          
     [SerializeField] private NetworkPrefabRef bigShieldPrefab;
     
@@ -257,7 +257,10 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
                 break;
             
             case Upgrades.Rockets:
-                ReplaceWeapon(playerObj, WeaponType.RocketLauncher);
+                if (weapon.CurrentWeapon == WeaponType.Raygun)
+                    ReplaceWeapon(playerObj, WeaponType.RocketLauncher);
+                else if (weapon.CurrentWeapon == WeaponType.BigRaygun)
+                    ReplaceWeapon(playerObj, WeaponType.BigRocketLauncher);
                 break;
             
             case Upgrades.Spaceship:
@@ -312,8 +315,8 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         {
             WeaponType.Raygun => raygunPrefab,
             WeaponType.BigRaygun => bigRaygunPrefab,
-            WeaponType.RocketLauncher => rocketPrefab,
-            WeaponType.BigRocketLauncher => bigRocketPrefab,
+            WeaponType.RocketLauncher => rocketLauncherPrefab,
+            WeaponType.BigRocketLauncher => bigRocketLauncherPrefab,
             _ => raygunPrefab
         };
         
@@ -324,7 +327,7 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
             playerObj.InputAuthority
         );
 
-        weaponObj.transform.SetParent(playerObj.transform, false);
+        weaponObj.transform.SetParent(playerObj.transform, true);
 
         var playerWeapon = weaponObj.GetComponent<PlayerWeapon>();
         if (playerWeapon != null)

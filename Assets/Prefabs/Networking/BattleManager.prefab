@@ -72,10 +72,10 @@ MonoBehaviour:
     RawGuidValue: 96dac8d767a2d5c488e58b7128305b6c
   bigRaygunPrefab:
     RawGuidValue: 6299e553fb966494c988267696f93fd8
-  rocketPrefab:
-    RawGuidValue: a01a56d1016917047b0f73ae150f915e
-  bigRocketPrefab:
-    RawGuidValue: 621871862e95b504d81f42068c0f5f74
+  rocketLauncherPrefab:
+    RawGuidValue: 03857a8e737f2aa488517ea02d853407
+  bigRocketLauncherPrefab:
+    RawGuidValue: 81010a934641c804693b1fdab6a68407
   smallShieldPrefab:
     RawGuidValue: c46746a6aa68309408bec32319e3c771
   bigShieldPrefab:

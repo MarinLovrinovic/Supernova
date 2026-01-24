@@ -103,6 +103,7 @@ MonoBehaviour:
   firingPoint: {fileID: 8823737974821731381}
   fireRate: 2
   fireTimer: 1
+  _CurrentWeapon: 1
 --- !u!114 &7658500450673404125
 MonoBehaviour:
   m_ObjectHideFlags: 0
