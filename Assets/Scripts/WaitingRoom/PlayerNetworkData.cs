@@ -93,17 +93,28 @@ public class PlayerNetworkData : NetworkBehaviour
     // i onda se igracu ovdi promijeni tijelo iz spriteova koji su spremljeni na svakom igracu
     void OnBodyChanged()
     {
+        /*
         if (BodyType == BodyType.Basic)
         {
             GetComponentInChildren<SpriteRenderer>().sprite = bodySprite[0];
+            GetComponentInChildren<Health>().maxHealth = 20;
+            GetComponentInChildren<PlayerMovement>().thrustForceAcceleration = 4;
+            GetComponentInChildren<PlayerMovement>().thrustForceAcceleration = 1;
         }
         else if (BodyType == BodyType.Heavy)
         {
             GetComponentInChildren<SpriteRenderer>().sprite = bodySprite[1];
+            GetComponentInChildren<Health>().maxHealth = 30;
+            GetComponentInChildren<PlayerMovement>().thrustForceAcceleration = 2;
+            GetComponentInChildren<PlayerMovement>().thrustForceAcceleration = 2;
         }
         else if (BodyType == BodyType.Light)
         {
             GetComponentInChildren<SpriteRenderer>().sprite = bodySprite[2];
+            GetComponentInChildren<Health>().maxHealth = 10;
+            GetComponentInChildren<PlayerMovement>().thrustForceAcceleration = 6;
+            GetComponentInChildren<PlayerMovement>().thrustForceAcceleration = 4;
         }
+        */
     }
 }

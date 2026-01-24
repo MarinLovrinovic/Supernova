@@ -25,6 +25,7 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
     
     private bool _battleEnded = false;
     private bool _winnerPopupOpened = false;
+    private Vector3 smallShieldOffset = new Vector3(0.0f, 2.0f, 0.0f);
     
     [Networked] public NetworkDictionary<PlayerRef, NetworkBool> AcceptedPlayers => default;
     [Networked] public NetworkDictionary<PlayerRef, Upgrades> PlayerUpgrades => default;
@@ -243,16 +244,16 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
                 if (player.Shield == ShieldType.None)
                 {
                     player.Shield = ShieldType.Small;
-                    AddShield();
+                    AddShield(playerObj);
                 }
                 else if (player.Shield == ShieldType.Small)
                 {
                     player.Shield = ShieldType.Large;
-                    UpgradeShield();
+                    UpgradeShield(playerObj);
                 }
                 else
                 {
-                    UpgradeShield();
+                    UpgradeShield(playerObj);
                 }
                 break;
             
@@ -273,6 +274,7 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
                 while (newType == player.BodyType); 
 
                 player.BodyType = newType;
+                ChangeBodyType(playerObj, newType);
                 break;
             }
             
@@ -292,14 +294,64 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         }
     }
 
-    private void AddShield()
+    private void ChangeBodyType(NetworkObject playerObj, BodyType newType)
     {
-        
+        List<Sprite> bodySprite = playerObj.GetComponent<PlayerNetworkData>().bodySprite;
+
+        if (newType == BodyType.Basic)
+        {
+            playerObj.GetComponent<SpriteRenderer>().sprite = bodySprite[0];
+            playerObj.GetComponent<Health>().maxHealth = 20;
+            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 4;
+            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 1;
+        }
+        else if (newType == BodyType.Heavy)
+        {
+            playerObj.GetComponent<SpriteRenderer>().sprite = bodySprite[1];
+            playerObj.GetComponent<Health>().maxHealth = 30;
+            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 2;
+            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 2;
+        }
+        else if (newType == BodyType.Light)
+        {
+            playerObj.GetComponent<SpriteRenderer>().sprite = bodySprite[2];
+            playerObj.GetComponent<Health>().maxHealth = 10;
+            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 6;
+            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 4;
+        }
     }
 
-    private void UpgradeShield()
+    private void AddShield(NetworkObject playerObj)
     {
+        if (!Object.HasStateAuthority) return;
 
+        NetworkPrefabRef prefab = smallShieldPrefab;
+
+        var shieldObj = Runner.Spawn(
+            prefab,
+            playerObj.transform.position,
+            playerObj.transform.rotation,
+            playerObj.InputAuthority
+        );
+
+        shieldObj.transform.SetParent(playerObj.transform, true);
+        shieldObj.transform.localPosition = smallShieldOffset;
+    }
+
+    private void UpgradeShield(NetworkObject playerObj)
+    {
+        if (!Object.HasStateAuthority) return;
+
+        NetworkPrefabRef prefab = bigShieldPrefab;
+
+        var shieldObj = Runner.Spawn(
+            prefab,
+            playerObj.transform.position,
+            playerObj.transform.rotation,
+            playerObj.InputAuthority
+        );
+
+        shieldObj.transform.SetParent(playerObj.transform, true);
     }
 
 

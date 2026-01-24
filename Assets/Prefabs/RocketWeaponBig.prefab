@@ -28,9 +28,9 @@ Transform:
   m_GameObject: {fileID: 2219208642778883057}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
+  m_LocalScale: {x: 7, y: 7, z: 7}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -102,7 +102,6 @@ MonoBehaviour:
     RawGuidValue: 621871862e95b504d81f42068c0f5f74
   firingPoint: {fileID: 8823737974821731381}
   fireRate: 1
-  fireTimer: 3
   _CurrentWeapon: 3
 --- !u!114 &-7370677268638862171
 MonoBehaviour:

@@ -32,8 +32,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 1}
-  m_LocalScale: {x: 2, y: 2, z: 0}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 4, y: 4, z: 0}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -163,10 +163,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0b8f92b78a34f31b2ce67ca021c4886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  healthPoints: 20
-  respawnHealthPoints: 20
+  deadLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  aliveLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  _HealthPoints: 0
+  _IsAlive:
+    _value: 1
+  maxHealth: 20
   numberOfLives: 1
-  isAlive: 1
   onLivesGone: 2
 --- !u!61 &-6133915488828185053
 BoxCollider2D:
