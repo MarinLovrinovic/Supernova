@@ -6,9 +6,7 @@ public class Health : NetworkBehaviour
 {
     public enum DeathAction { DoNothingWhenDead, DestroyedWhenDead }
 
-    [SerializeField] private LayerMask deadLayer;
-    [SerializeField] private LayerMask aliveLayer;
-
+    [SerializeField] private bool playerHealth = true;
     [Networked] public float HealthPoints { get; set; }
 
     [Networked, OnChangedRender(nameof(OnAliveChanged))]
@@ -71,7 +69,7 @@ public class Health : NetworkBehaviour
     {
         UpdateVisuals(IsAlive);
         
-        if (!IsAlive && Object.HasInputAuthority && !_openedLocalShop)
+        if (playerHealth && !IsAlive && Object.HasInputAuthority && !_openedLocalShop)
         {
             _openedLocalShop = true;
 
@@ -101,6 +99,12 @@ public class Health : NetworkBehaviour
         if (_col) _col.enabled = state;
         if (_rb) _rb.simulated = state;
 
-        gameObject.layer = state ? aliveLayer : deadLayer; 
+        foreach (Renderer r in GetComponentsInChildren<Renderer>())
+        {
+            if (r)
+            {
+                r.enabled = state;
+            }
+        }
     }
 }

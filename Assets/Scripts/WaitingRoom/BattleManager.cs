@@ -209,11 +209,13 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
 
             if (Runner.TryGetPlayerObject(playerRef, out var playerObj))
             {
-                var health = playerObj.GetComponent<Health>();
-                if (health)
+                foreach (var health in playerObj.GetComponentsInChildren<Health>())
                 {
-                    health.IsAlive = true;
-                    health.HealthPoints = health.maxHealth;
+                    if (health)
+                    {
+                        health.IsAlive = true;
+                        health.HealthPoints = health.maxHealth;
+                    }    
                 }
                 
                 if (PlayerUpgrades.ContainsKey(playerRef)) 
@@ -274,7 +276,6 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
                 while (newType == player.BodyType); 
 
                 player.BodyType = newType;
-                ChangeBodyType(playerObj, newType);
                 break;
             }
             
@@ -291,33 +292,6 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
             default:
                 Debug.Log("Upgrade not implemented: " + upgrade);
                 break;
-        }
-    }
-
-    private void ChangeBodyType(NetworkObject playerObj, BodyType newType)
-    {
-        List<Sprite> bodySprite = playerObj.GetComponent<PlayerNetworkData>().bodySprite;
-
-        if (newType == BodyType.Basic)
-        {
-            playerObj.GetComponent<SpriteRenderer>().sprite = bodySprite[0];
-            playerObj.GetComponent<Health>().maxHealth = 20;
-            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 4;
-            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 1;
-        }
-        else if (newType == BodyType.Heavy)
-        {
-            playerObj.GetComponent<SpriteRenderer>().sprite = bodySprite[1];
-            playerObj.GetComponent<Health>().maxHealth = 30;
-            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 2;
-            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 2;
-        }
-        else if (newType == BodyType.Light)
-        {
-            playerObj.GetComponent<SpriteRenderer>().sprite = bodySprite[2];
-            playerObj.GetComponent<Health>().maxHealth = 10;
-            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 6;
-            playerObj.GetComponent<PlayerMovement>().thrustForceAcceleration = 4;
         }
     }
 
@@ -376,10 +350,9 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
             prefab,
             playerObj.transform.position,
             playerObj.transform.rotation,
-            playerObj.InputAuthority
+            playerObj.InputAuthority,
+            (runner, o) => o.transform.SetParent(playerObj.transform, true)
         );
-
-        weaponObj.transform.SetParent(playerObj.transform, true);
 
         var playerWeapon = weaponObj.GetComponent<PlayerWeapon>();
         if (playerWeapon != null)

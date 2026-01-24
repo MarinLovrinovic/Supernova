@@ -38,6 +38,10 @@ public class Projectile : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        // had to add this due to NullReferenceException
+        if (Object == null || !Object.IsValid)
+            return;
+        
         if (!Object.HasStateAuthority)
             return;
 

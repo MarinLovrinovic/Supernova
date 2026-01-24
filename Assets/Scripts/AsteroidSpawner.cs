@@ -45,7 +45,7 @@ public class AsteroidSpawner : NetworkBehaviour
 
         for (int i = 0; i < number; i++)
         {
-            Vector3 viewportPosition = new Vector3(Random.Range(0.0f, 1.0f), Random.Range(0.0f, 1.0f), 10f);
+            Vector3 viewportPosition = new Vector3(Random.Range(0.1f, 0.9f), Random.Range(0.1f, 0.9f), 10f);
             Vector3 worldPosition = camera.ViewportToWorldPoint(viewportPosition);
             worldPosition.z = 0.0f;
 
