@@ -17,6 +17,7 @@ public class PlayerNetworkData : NetworkBehaviour
     [Networked] public ShieldType Shield { get; set; }
     
     [Networked] public bool IsReady { get; set; }
+    [Networked] public int Lives { get; set; }
 
     public static PlayerNetworkData Local;
 
@@ -24,6 +25,11 @@ public class PlayerNetworkData : NetworkBehaviour
     {
         DontDestroyOnLoad(gameObject);
         IsReady = false;
+
+        if (Object.HasStateAuthority)
+        {
+            Lives = 3;
+        }
 
         if (Object.HasStateAuthority && ColorIndex == -1 && WaitingRoomManager.Instance)
         {

@@ -12,6 +12,7 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
 
     [Header("Settings")]
     [SerializeField] private string upgradeShopSceneName = "UpgradeShop";
+    [SerializeField] private string gameOverSceneName = "GameOver";
     [SerializeField] private int nextRoundCountdownSeconds = 10;
     
     [SerializeField] public NetworkPrefabRef defaultWeaponPrefab;
@@ -34,6 +35,8 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
     [Networked] public TickTimer NextRoundTimer { get; set; }
     [Networked] public NetworkBool NextRoundCountdownRunning { get; set; }
     [Networked] public PlayerRef WinnerRef { get; set; }
+    [Networked] public NetworkBool GameOver { get; set; }
+    [Networked] public PlayerRef FinalWinner { get; set; }
 
     public override void Spawned()
     {
@@ -56,13 +59,16 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
 
         if (Object.HasStateAuthority)
         {
+            GameOver = false;
             AsteroidSpawner.Instance.SpawnAsteroids(Runner);
         }
     }
 
     public override void FixedUpdateNetwork()
     {
-        if (!Object.HasStateAuthority) return; 
+        if (!Object.HasStateAuthority) return;
+
+        if (GameOver) return;
 
         if (!_battleEnded) 
         {
@@ -87,11 +93,12 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
             if (Runner.TryGetPlayerObject(playerRef, out var playerObj))
             {
                 var health = playerObj.GetComponent<Health>();
-                if (health != null && health.IsAlive)
+                var playerData = playerObj.GetComponent<PlayerNetworkData>();
+                if (health != null && health.IsAlive && playerData != null && playerData.Lives > 0)
                 {
                     aliveCount++;
                     lastAliveRef = playerRef;
-                    lastAlivePlayer = playerObj.GetComponent<PlayerNetworkData>();
+                    lastAlivePlayer = playerData;
                 }
             }
         }
@@ -118,6 +125,44 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
             Debug.Log($"Winner is {winner.Id}");
         }
 
+        foreach (var player in Runner.ActivePlayers)
+        {
+            if (Runner.TryGetPlayerObject(player, out var playerObj))
+            {
+                var playerData = playerObj.GetBehaviour<PlayerNetworkData>();
+                if (playerData != null && player != winnerRef &&  playerData.Lives > 0)
+                {
+                    playerData.Lives--;
+                    Debug.Log($"Player {player} lost a life. Lives remaining: {playerData.Lives}");
+                }
+            }
+        }
+
+        int playersWithLives = 0;
+        PlayerRef finalWinnerRef = default;
+
+        foreach (var player in Runner.ActivePlayers)
+        {
+            if (Runner.TryGetPlayerObject(player, out var playerObj))
+            {
+                var playerData = playerObj.GetComponent<PlayerNetworkData>();
+                if (playerData != null && playerData.Lives > 0)
+                {
+                    playersWithLives++;
+                    finalWinnerRef = player;
+                }
+            }
+        }
+
+        if (playersWithLives <= 1)
+        {
+            GameOver = true;
+            FinalWinner = finalWinnerRef;
+            AsteroidSpawner.Instance.DespawnAsteroids(Runner);
+            RPC_ShowGameOver(finalWinnerRef);
+            return;
+        }
+
         AsteroidSpawner.Instance.DespawnAsteroids(Runner);
         
         WinnerRef = winnerRef;
@@ -125,8 +170,20 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         {
             AcceptedPlayers.Remove(WinnerRef);
         }
-        
-        AcceptRequired = Mathf.Max(0, Runner.ActivePlayers.Count() - 1);
+
+        AcceptRequired = 0;
+        foreach (var player in Runner.ActivePlayers)
+        {
+            if (Runner.TryGetPlayerObject(player, out var playerObj))
+            {
+                var playerData = playerObj.GetComponent<PlayerNetworkData>();
+                if (playerData != null && playerData.Lives > 0 && player != winnerRef)
+                {
+                    AcceptRequired++;
+                }
+            }
+        }
+
         NextRoundCountdownRunning = false;
         
         if (!_winnerPopupOpened)
@@ -144,10 +201,36 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         
     }
 
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ShowGameOver(PlayerRef finalWinnerRef)
+    {
+        if (Runner == null) 
+            return;
+
+        Runner.ProvideInput = false;
+
+        var shopScene = SceneManager.GetSceneByName(upgradeShopSceneName);
+        if (shopScene.IsValid() && shopScene.isLoaded)
+            SceneManager.UnloadSceneAsync(upgradeShopSceneName);
+
+        SceneManager.LoadSceneAsync(gameOverSceneName, LoadSceneMode.Additive);
+    }
+
 
     public void ServerRegisterAccept(PlayerRef player)
     {
         if (!Object.HasStateAuthority) return;
+        if (GameOver) return;
+
+        if (Runner.TryGetPlayerObject(player, out var playerObj))
+        {
+            var playerData = playerObj.GetComponent<PlayerNetworkData>();
+            if (playerData != null && playerData.Lives <= 0)
+            {
+                Debug.Log("$Player {player} has no lives left, ignoring accept");
+                return;
+            }
+        }
 
         if (AcceptRequired <= 0 && Runner != null)
         {
@@ -209,13 +292,18 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
 
             if (Runner.TryGetPlayerObject(playerRef, out var playerObj))
             {
-                foreach (var health in playerObj.GetComponentsInChildren<Health>())
+                var playerData = playerObj.GetComponent<PlayerNetworkData>();
+
+                if (playerData != null && playerData.Lives > 0)
                 {
-                    if (health)
+                    foreach (var health in playerObj.GetComponentsInChildren<Health>())
                     {
-                        health.IsAlive = true;
-                        health.HealthPoints = health.maxHealth;
-                    }    
+                        if (health)
+                        {
+                            health.IsAlive = true;
+                            health.HealthPoints = health.maxHealth;
+                        }
+                    }
                 }
                 
                 if (PlayerUpgrades.ContainsKey(playerRef)) 
@@ -383,25 +471,45 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
     {
         if (Runner == null) return;
 
-        Runner.ProvideInput = true;
-        
-        var shopScene = SceneManager.GetSceneByName(upgradeShopSceneName); 
-        if (shopScene.IsValid() && shopScene.isLoaded) 
+        var shopScene = SceneManager.GetSceneByName(upgradeShopSceneName);
+        if (shopScene.IsValid() && shopScene.isLoaded)
+        {
+            Debug.Log("[BattleManager] Unloading shop scene");
             SceneManager.UnloadSceneAsync(upgradeShopSceneName);
-        
+        }
+
+        Runner.ProvideInput = true;
     }
-    
+
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    private void RPC_OpenWinnerPopup(PlayerRef winnerRef) 
+    private void RPC_OpenWinnerPopup(PlayerRef winnerRef)
     {
         if (Runner == null) return;
-        if (Runner.LocalPlayer != winnerRef) return;
+
+        var shopScene = SceneManager.GetSceneByName(upgradeShopSceneName);
+        if (shopScene.IsValid() && shopScene.isLoaded)
+        {
+            Debug.Log("[BattleManager] Shop already loaded, skipping");
+            return;
+        }
+
+        if (Runner.TryGetPlayerObject(Runner.LocalPlayer, out var playerObj))
+        {
+            var playerData = playerObj.GetComponent<PlayerNetworkData>();
+            if (playerData != null && playerData.Lives <= 0)
+            {
+                Debug.Log("[BattleManager] Player eliminated, loading shop in spectator mode");
+                Runner.ProvideInput = false;
+                SceneManager.LoadSceneAsync(upgradeShopSceneName, LoadSceneMode.Additive);
+                return;
+            }
+        }
 
         Runner.ProvideInput = false;
         SceneManager.LoadSceneAsync(upgradeShopSceneName, LoadSceneMode.Additive);
     }
-    
+
     [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     public void RPC_SubmitUpgrade(PlayerRef player, Upgrades upgrade)
     {
@@ -411,5 +519,10 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
             PlayerUpgrades.Remove(player);      
 
         PlayerUpgrades.Add(player, upgrade);
+    }
+    private bool IsShopLoadedLocally()
+    {
+        var shopScene = SceneManager.GetSceneByName(upgradeShopSceneName);
+        return shopScene.IsValid() && shopScene.isLoaded;
     }
 }

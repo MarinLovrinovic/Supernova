@@ -25,13 +25,13 @@ public class Health : NetworkBehaviour
     {
         _rb = GetComponent<Rigidbody2D>();
         _col = GetComponent<Collider2D>();
+        _openedLocalShop = false;
 
         if (Object.HasStateAuthority)
         {
             HealthPoints = maxHealth;
             IsAlive = true;
         }
-
         UpdateVisuals(IsAlive);
     }
 
@@ -68,24 +68,24 @@ public class Health : NetworkBehaviour
     public void OnAliveChanged()
     {
         UpdateVisuals(IsAlive);
-        
+
         if (playerHealth && !IsAlive && Object.HasInputAuthority && !_openedLocalShop)
         {
             _openedLocalShop = true;
-
             if (Runner != null)
             {
                 Runner.ProvideInput = false;
             }
-            
-            SceneManager.LoadSceneAsync("UpgradeShop", LoadSceneMode.Additive);
+
+            var playerData = GetComponent<PlayerNetworkData>();
+            Debug.Log("[Health] Player died. Lives: " + (playerData?.Lives ?? -1));
         }
 
         if (!IsAlive && onLivesGone == DeathAction.DestroyedWhenDead)
         {
         }
     }
-    
+
     public void ResumeAfterShopLocal()
     {
         if (Runner != null)

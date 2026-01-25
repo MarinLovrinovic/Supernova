@@ -19,9 +19,12 @@ public class UpgradeShop : MonoBehaviour
     [SerializeField] private GameObject upgradeShopEmpty; 
     [SerializeField] private GameObject afterAcceptEmpty;
     [SerializeField] private GameObject winnerViewEmpty;
+    [SerializeField] private GameObject eliminatedViewEmpty;
     
     [SerializeField] private TMP_Text winnerCounter;
     [SerializeField] private TMP_Text afterAcceptCounter;
+    [SerializeField] private TMP_Text eliminatedCounter;
+    [SerializeField] private TMP_Text livesText;
     [SerializeField] private Image afterAcceptUpgradeImage;
     
     
@@ -40,12 +43,33 @@ public class UpgradeShop : MonoBehaviour
 
         bool iAmWinner = battleManager != null && battleManager.WinnerRef != default && 
                          battleManager.Runner != null && battleManager.Runner.LocalPlayer == battleManager.WinnerRef;
+
+        bool iAmEliminated = false;
+        int myLives = 0;
+
+        if (battleManager != null && battleManager.Runner != null)
+        {
+            if(battleManager.Runner.TryGetPlayerObject(battleManager.Runner.LocalPlayer, out var myPlayerObj))
+            {
+                var myPlayerData = myPlayerObj.GetComponent<PlayerNetworkData>();
+                if (myPlayerData != null)
+                {
+                    myLives = myPlayerData.Lives;
+                    iAmEliminated = myLives <= 0;
+                }
+            }
+        } 
         
         if (upgradeShopEmpty != null) upgradeShopEmpty.SetActive(false); 
         if (afterAcceptEmpty != null) afterAcceptEmpty.SetActive(false); 
         if (winnerViewEmpty != null) winnerViewEmpty.SetActive(false);   
-        
-        if (iAmWinner)
+        if (eliminatedViewEmpty != null) eliminatedViewEmpty.SetActive(false);   
+
+        if (iAmEliminated)
+        {
+            if (eliminatedViewEmpty != null) eliminatedViewEmpty.SetActive(true);
+        }
+        else if (iAmWinner)
         {
             if (winnerViewEmpty != null) winnerViewEmpty.SetActive(true); 
         }
@@ -53,13 +77,20 @@ public class UpgradeShop : MonoBehaviour
         {
             if (upgradeShopEmpty != null) upgradeShopEmpty.SetActive(true); 
         }
+
+        if (livesText != null && !iAmEliminated)
+        {
+            livesText.text = $"Lives: {myLives}";
+        }
         
         Debug.Log($"[UpgradeShop Views] shop={(upgradeShopEmpty != null && upgradeShopEmpty.activeSelf)} " +
                   $"after={(afterAcceptEmpty != null && afterAcceptEmpty.activeSelf)} " +
                   $"winner={(winnerViewEmpty != null && winnerViewEmpty.activeSelf)}"); 
 
         buttons = upgradeButtonsContainer.GetComponentsInChildren<Button>();
-        SpawnButtons(numberOfUpgradesDisplayed);
+
+        if(!iAmEliminated)
+            SpawnButtons(numberOfUpgradesDisplayed);
         
     }
     
@@ -67,12 +98,12 @@ public class UpgradeShop : MonoBehaviour
     {
         bool afterAcceptActive = (afterAcceptEmpty != null && afterAcceptEmpty.activeSelf); 
         bool winnerViewActive = (winnerViewEmpty != null && winnerViewEmpty.activeSelf);   
+        bool eliminatedActive = (eliminatedViewEmpty != null && eliminatedViewEmpty.activeSelf);   
         
-        if (!afterAcceptActive && !winnerViewActive) return;                
+        if (!afterAcceptActive && !winnerViewActive && !eliminatedActive) return;                
         
         string text;
         
-        if (afterAcceptCounter == null) return;
         if (BattleManager.Instance == null) return;
 
         if (BattleManager.Instance.NextRoundCountdownRunning)
@@ -92,6 +123,9 @@ public class UpgradeShop : MonoBehaviour
 
         if (winnerViewActive && winnerCounter != null)
             winnerCounter.text = text;
+
+        if (eliminatedActive && eliminatedCounter != null)
+            eliminatedCounter.text = text;
     }
     
     T[] GetRandomEnumValues<T>(int count)
@@ -152,7 +186,7 @@ public class UpgradeShop : MonoBehaviour
             if (!upgradeIsSelected) return;
 
             acceptButton.interactable = false;
-            
+
             if (upgradeShopEmpty != null) upgradeShopEmpty.SetActive(false);
             if (afterAcceptEmpty != null) afterAcceptEmpty.SetActive(true);
 
@@ -165,11 +199,11 @@ public class UpgradeShop : MonoBehaviour
                     afterAcceptUpgradeImage.preserveAspect = true;
                 }
             }
-            
+
             if (battleManager != null && battleManager.Runner != null)
             {
                 battleManager.RPC_SubmitUpgrade(battleManager.Runner.LocalPlayer, chosenUpgrade);
-                
+
                 if (PlayerNetworkData.Local != null)
                     PlayerNetworkData.Local.RPC_ClickedAccept();
 
@@ -179,9 +213,8 @@ public class UpgradeShop : MonoBehaviour
                     if (health != null) health.ResumeAfterShopLocal();
                 }
             }
-                          
         });
-        
+
         var contRt = upgradeButtonsContainer as RectTransform;
         if (contRt != null) LayoutRebuilder.ForceRebuildLayoutImmediate(contRt);
     }
