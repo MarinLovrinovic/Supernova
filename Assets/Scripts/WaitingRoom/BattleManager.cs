@@ -268,14 +268,7 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
             
             case Upgrades.Spaceship:
             {
-                BodyType newType;
-                do
-                {
-                    newType = (BodyType)Random.Range(0, 3);
-                }
-                while (newType == player.BodyType); 
-
-                player.BodyType = newType;
+                player.BodyType = (BodyType)(((int)player.BodyType + Random.Range(1, 3)) % 3);
                 break;
             }
             
@@ -348,10 +341,10 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
         
         var weaponObj = Runner.Spawn(
             prefab,
-            playerObj.transform.position,
-            playerObj.transform.rotation,
+            null,
+            null,
             playerObj.InputAuthority,
-            (runner, o) => o.transform.SetParent(playerObj.transform, true)
+            (runner, o) => o.transform.SetParent(playerObj.transform, false)
         );
 
         var playerWeapon = weaponObj.GetComponent<PlayerWeapon>();

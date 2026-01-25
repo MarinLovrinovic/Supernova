@@ -289,7 +289,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 1393f873fe2b4bf4eacaeea4dbbcdcad, type: 3}
   - {fileID: 21300000, guid: a3086b66fc338f440bcd599e3f38823a, type: 3}
   - {fileID: 21300000, guid: 7b09004dd5a38d94592bd54c8ae492cd, type: 3}
-  _BodyType: 2
+  _BodyType: 0
   _Shield: 0
   _IsReady: 0
 --- !u!114 &1212094670498292084
@@ -508,14 +508,6 @@ PrefabInstance:
       propertyPath: SortKey
       value: 136143770
       objectReference: {fileID: 0}
-    - target: {fileID: -7120052115207748800, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
-      propertyPath: NetworkedBehaviours.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: -7120052115207748800, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[1]
-      value: 
-      objectReference: {fileID: 1058103286253829072}
     - target: {fileID: 2219208642778883057, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
       propertyPath: m_Name
       value: LaserWeapon
@@ -526,7 +518,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8823737974821731381, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8823737974821731381, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -565,17 +557,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
---- !u!114 &1058103286253829072 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 392979708423719671, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
-  m_PrefabInstance: {fileID: 854284952124879143}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 158639473, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1651547761916211815 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -7120052115207748800, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}

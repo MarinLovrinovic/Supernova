@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 7642631939882523477}
   - component: {fileID: 1212094670498292084}
   - component: {fileID: 608660546175625974}
+  - component: {fileID: 5027942320997944965}
   m_Layer: 0
   m_Name: SpaceshipLight
   m_TagString: Player
@@ -160,12 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0b8f92b78a34f31b2ce67ca021c4886, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deadLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  aliveLayer:
-    serializedVersion: 2
-    m_Bits: 1
+  playerHealth: 1
   _HealthPoints: 0
   _IsAlive:
     _value: 1
@@ -312,6 +308,89 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!60 &5027942320997944965
+PolygonCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1029672585926967827}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 2.5, y: 2.5}
+    newSize: {x: 2.5, y: 2.5}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: -0.19999999, y: -1.12}
+      - {x: 0.21, y: -1.11}
+      - {x: 0.41, y: -1.11}
+      - {x: 0.51, y: -1.04}
+      - {x: 0.59, y: -0.96}
+      - {x: 0.74, y: -0.78999996}
+      - {x: 0.72999996, y: -1.1}
+      - {x: 0.78999996, y: -1.18}
+      - {x: 0.96, y: -1.18}
+      - {x: 1, y: -1.17}
+      - {x: 1.13, y: -1.01}
+      - {x: 1.13, y: -0.08}
+      - {x: 1.0799999, y: -0.01}
+      - {x: 0.98999995, y: 0.29}
+      - {x: 0.89, y: 0.39}
+      - {x: 0.74, y: 0.41}
+      - {x: 0.66999996, y: -0.38}
+      - {x: 0.28, y: -0.17999999}
+      - {x: 0.21, y: -0.16}
+      - {x: 0.21, y: 0.53}
+      - {x: 0.13, y: 0.61}
+      - {x: -0.14, y: 0.61}
+      - {x: -0.22, y: 0.53}
+      - {x: -0.19999999, y: -0.17}
+      - {x: -0.26999998, y: -0.13}
+      - {x: -0.65, y: -0.38}
+      - {x: -0.72999996, y: -0.44}
+      - {x: -0.74, y: 0.41}
+      - {x: -0.89, y: 0.39}
+      - {x: -0.98999995, y: 0.29}
+      - {x: -1.13, y: -0.06}
+      - {x: -1.13, y: -1.03}
+      - {x: -0.98999995, y: -1.17}
+      - {x: -0.96, y: -1.18}
+      - {x: -0.82, y: -1.18}
+      - {x: -0.72999996, y: -1.1}
+      - {x: -0.59999996, y: -0.94}
+      - {x: -0.45, y: -1.11}
+  m_UseDelaunayMesh: 0
 --- !u!1 &4343121700145042240
 GameObject:
   m_ObjectHideFlags: 0
@@ -463,7 +542,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8823737974821731381, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8823737974821731381, guid: 96dac8d767a2d5c488e58b7128305b6c, type: 3}
       propertyPath: m_LocalPosition.z

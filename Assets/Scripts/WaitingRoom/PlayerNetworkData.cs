@@ -1,6 +1,7 @@
 using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 using Fusion.Addons.Physics;
 
 public class PlayerNetworkData : NetworkBehaviour
@@ -84,35 +85,38 @@ public class PlayerNetworkData : NetworkBehaviour
         if (Object.HasInputAuthority)
             IsReady = ready;
     }
-
-
-
-    // trebalo bi u upgrade shopu kada se treba promijenit tijelo napravit
-    // slicno ka u customization kada se odabere boja da se posalje rpc request hostu 
-    // i da host onda u biti promijeni vrijednost BodyType odredenog igraca
-    // i onda se igracu ovdi promijeni tijelo iz spriteova koji su spremljeni na svakom igracu
+    
     void OnBodyChanged()
     {
-        if (BodyType == BodyType.Basic)
+        // basic body stats
+        int spriteIndex = 0;
+        int maxHealth = 20;
+        int acceleration = 4;
+        
+        if (BodyType == BodyType.Heavy)
         {
-            GetComponent<SpriteRenderer>().sprite = bodySprite[0];
-            GetComponent<Health>().maxHealth = 20;
-            GetComponent<PlayerMovement>().thrustForceAcceleration = 4;
-            GetComponent<PlayerMovement>().thrustForceAcceleration = 1;
-        }
-        else if (BodyType == BodyType.Heavy)
-        {
-            GetComponent<SpriteRenderer>().sprite = bodySprite[1];
-            GetComponent<Health>().maxHealth = 30;
-            GetComponent<PlayerMovement>().thrustForceAcceleration = 2;
-            GetComponent<PlayerMovement>().thrustForceAcceleration = 2;
+            spriteIndex = 1;
+            maxHealth = 30;
+            acceleration = 2;
         }
         else if (BodyType == BodyType.Light)
         {
-            GetComponent<SpriteRenderer>().sprite = bodySprite[2];
-            GetComponent<Health>().maxHealth = 10;
-            GetComponent<PlayerMovement>().thrustForceAcceleration = 6;
-            GetComponent<PlayerMovement>().thrustForceAcceleration = 4;
+            spriteIndex = 2;
+            maxHealth = 10;
+            acceleration = 6;
         }
+        GetComponent<SpriteRenderer>().sprite = bodySprite[spriteIndex];
+        var health = GetComponent<Health>();
+        health.maxHealth = maxHealth;
+        health.HealthPoints = maxHealth;
+        GetComponent<PlayerMovement>().thrustForceAcceleration = acceleration;
+        
+        // add and remove trigger collider so that hitbox adjusts to sprite
+        PolygonCollider2D oldCollider = GetComponents<PolygonCollider2D>().First(x => x.isTrigger);
+        if (oldCollider)
+        {
+            Destroy(oldCollider);
+        }
+        gameObject.AddComponent<PolygonCollider2D>().isTrigger = true;
     }
 }
