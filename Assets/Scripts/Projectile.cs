@@ -9,8 +9,13 @@ public class Projectile : NetworkBehaviour
 {
     [SerializeField] float speed = 10f;
     [SerializeField] float lifeTime = 1f;
-    public GameObject[] respawns;
     public float damageAmount = 10f;
+
+    [SerializeField] private NetworkPrefabRef explosionPrefab;
+    [SerializeField] private int explosionPrefabIndex = 0;
+    [SerializeField] private float explosionRadius = 1.0f;
+    [SerializeField] private float explosionDamage;
+    
     [Networked] private TickTimer currentLifeTime { get; set; }
     [Networked] public PlayerRef projectileOwner { get; set; }
     public override void Spawned()
@@ -26,14 +31,11 @@ public class Projectile : NetworkBehaviour
     }
     public override void FixedUpdateNetwork()
     {
-        CheckLifetime();
-    }
-
-    private void CheckLifetime()
-    {
-        if (!currentLifeTime.Expired(Runner)) return;
-
-        Runner.Despawn(Object);
+        if (currentLifeTime.Expired(Runner))
+        {
+            Explode();
+            Runner.Despawn(Object);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -45,19 +47,50 @@ public class Projectile : NetworkBehaviour
         if (!Object.HasStateAuthority)
             return;
 
-        if (!other.CompareTag("Player"))
+        if (other.TryGetComponent(out NetworkObject netObj) && netObj.InputAuthority == projectileOwner)
             return;
 
-        var netObj = other.GetComponent<NetworkObject>();
-        if (netObj != null && netObj.InputAuthority == projectileOwner)
-            return;
-
-        var health = other.GetComponent<Health>();
-        if (health != null && health.IsAlive)
+        if (other.TryGetComponent(out Health health) && health.IsAlive)
         {
             health.ApplyDamage(damageAmount);
         }
 
+        Explode();
         Runner.Despawn(Object);
+    }
+
+    private void Explode()
+    {
+        if (!Object.HasStateAuthority)
+            return;
+        
+        Runner.Spawn(
+            explosionPrefab,
+            transform.position,
+            Quaternion.identity,
+            PlayerRef.None,
+            (runner, o) => o.transform.localScale = Vector3.one * explosionRadius * 2.0f);
+
+        if (explosionDamage == 0)
+            return;
+        
+        Vector2 explosionCenter = transform.position;
+        
+        Collider2D[] hits = Physics2D.OverlapCircleAll(explosionCenter, explosionRadius);
+
+        foreach (Collider2D hit in hits)
+        {
+            if (!hit.isTrigger)
+                continue;
+            
+            if (hit.TryGetComponent(out NetworkObject netObj) && netObj.InputAuthority == projectileOwner)
+                continue;
+
+            if (!hit.TryGetComponent(out Health health) || !health.IsAlive)
+                continue;
+
+            health.ApplyDamage(explosionDamage);
+            Debug.Log($"Explosion hit {hit.gameObject.name}");
+        }
     }
 }

@@ -102,7 +102,7 @@ MonoBehaviour:
   projectilePrefab:
     RawGuidValue: a01a56d1016917047b0f73ae150f915e
   firingPoint: {fileID: 8823737974821731381}
-  fireRate: 1
+  fireRate: 0.8
   _CurrentWeapon: 2
 --- !u!114 &-3917920244551228171
 MonoBehaviour:

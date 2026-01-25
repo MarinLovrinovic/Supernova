@@ -91,19 +91,19 @@ public class PlayerNetworkData : NetworkBehaviour
         // basic body stats
         int spriteIndex = 0;
         int maxHealth = 20;
-        int acceleration = 4;
+        int acceleration = 5;
         
         if (BodyType == BodyType.Heavy)
         {
             spriteIndex = 1;
             maxHealth = 30;
-            acceleration = 2;
+            acceleration = 3;
         }
         else if (BodyType == BodyType.Light)
         {
             spriteIndex = 2;
             maxHealth = 10;
-            acceleration = 6;
+            acceleration = 7;
         }
         GetComponent<SpriteRenderer>().sprite = bodySprite[spriteIndex];
         var health = GetComponent<Health>();

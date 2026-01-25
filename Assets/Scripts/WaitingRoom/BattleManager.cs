@@ -262,7 +262,7 @@ public class BattleManager : NetworkBehaviour, IPlayerSpawnerHandler
             case Upgrades.Rockets:
                 if (weapon.CurrentWeapon == WeaponType.Raygun)
                     ReplaceWeapon(playerObj, WeaponType.RocketLauncher);
-                else if (weapon.CurrentWeapon == WeaponType.BigRaygun)
+                else if (weapon.CurrentWeapon is WeaponType.BigRaygun or WeaponType.RocketLauncher)
                     ReplaceWeapon(playerObj, WeaponType.BigRocketLauncher);
                 break;
             

@@ -80,6 +80,9 @@ MonoBehaviour:
     RawGuidValue: c46746a6aa68309408bec32319e3c771
   bigShieldPrefab:
     RawGuidValue: 512160e2458130f4fbf2db9aa63177c3
+  vfxPrefabs:
+  - RawGuidValue: 6166a3be9a2427a448fadc8f5beaaabd
+  - RawGuidValue: bd9ea4c59273aba42aed2815854c555c
   _AcceptedPlayers:
     _items: []
   _PlayerUpgrades:
